@@ -10,7 +10,8 @@ var express = require('express'),
   routes = require('./routes/index'),
   api = require('./routes/api'),
   http = require('http'),
-  path = require('path');
+  path = require('path'),
+  mongoose = require('mongoose');
 
 var app = module.exports = express();
 
@@ -31,6 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('node_modules'));
 
 app.use('/', routes);
+app.use('/api',api);
 
 var env = process.env.NODE_ENV || 'development';
 
@@ -50,23 +52,16 @@ if (env === 'production') {
   // TODO
 }
 
-
-// /**
-//  * Routes
-//  */
-
-// // serve index and view partials
-// app.get('/', routes.index);
-// app.get('/partials/:name', routes.partials);
-
-// // JSON API
-// app.get('/api/name', api.name);
-
-// // redirect all others to the index (HTML5 history)
-// app.get('*', routes.index);
-
-
-
+/*
+ * MongoDB connection
+ */
+mongoose.connect('mongodb://localhost/apusbuy');
+mongoose.connection.on('open', () => {
+  console.log('Connected to MongoDB');
+});
+mongoose.connection.on('error', err => {
+  console.log('Mongoose Error. ' + err);
+});
 
 
 /**

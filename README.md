@@ -13,3 +13,9 @@ visit either of the following
 if no $PORT variable is found, visit
 http://localhost:3000/
 
+#TESTING
+
+To run tests, run
+
+npm test [file name]
+
