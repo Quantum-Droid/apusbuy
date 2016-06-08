@@ -25,4 +25,4 @@ var clientSchema = mongoose.Schema({
 	
 })
 
-module.exports = mongoose.model('Product', clientSchema);	
+module.exports = mongoose.model('Client', clientSchema);	

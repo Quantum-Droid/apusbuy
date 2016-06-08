@@ -6,8 +6,8 @@ var adminSchema = mongoose.Schema({
 	name: String,
 	lastName: String,
 	email: String,
-	passwordDigest: String,
-	rol: String
+	password: String,
+	role: String
 })
 
-module.exports = mongoose.model('Product', adminSchema);	
+module.exports = mongoose.model('Admin', adminSchema);	

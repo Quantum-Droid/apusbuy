@@ -8,4 +8,4 @@ var inventorySchema = mongoose.Schema({
 	ammount: Number
 })
 
-module.exports = mongoose.model('Product', inventorySchema);	
+module.exports = mongoose.model('Inventory', inventorySchema);	
