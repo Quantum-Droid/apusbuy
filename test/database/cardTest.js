@@ -2,97 +2,66 @@ var dbUrl    = 'mongodb://localhost/apusbuy';
 var should   = require('chai').should();
 var mongoose = require('mongoose');
 var Card  = require('../../models/card');
-var clearDB  = require('mocha-mongoose')(dbUrl);
 
+var id;
+var card;
 
 describe("Card Test", function() {
+  before((done) =>{
+    card = new Card();
+    card.number = 4012888888881881;
+    card.code = 789;
+    card.expirationDate = "05/21"
+    done();
+  })
+
+  after((done)=>{
+    Card.remove({_id: id}, (err) =>{
+      if(err) return done(err);
+      done();
+    })
+  })
+
   beforeEach(function(done) {
     if (mongoose.connection.db) return done();
 
     mongoose.connect(dbUrl, done);
   });
 
-  it("Cards can be saved", function(done) {
-    var card = new Card();
-    card.number = 5555555555554444
-    card.code = 123
-    card.expirationDate = "09/18"    
+  it("Cards can be saved", function(done) {    
 
-    card.save(done);
-  });
-
-  it("Cards have right properties", function(done){
-    var card = new Card();
-    card.number = 5555555555554444
-    card.code = 123
-    card.expirationDate = "09/18"
-    card.save(function(err, model){
-        if(err) return done(err);
-        
-        //verify
-        model.should.be.an.instanceof(Card);
-        model.should.have.property('number');
-        model.should.have.property('code');
-        model.should.have.property('expirationDate');                
-        done();
-
-      });
-  });
-
-  it("Cards can be listed", function(done) {
-    var card_1 = new Card();
-    card_1.number = 5555555555554444
-    card_1.code = 123
-    card_1.expirationDate = "09/18"
-    card_1.save(function(err, model){
-      if (err) return done(err);
-      //second card
-      var card_2 = new Card();
-      card_2.number = 5105105105105100
-      card_2.code = 456
-      card_2.expirationDate = "12/20"
-      card_2.save(function(err, model){
-        if (err) return done(err);
-
-        Card.find({}, function(err, docs){
-          if (err) return done(err);
-
-          // without clearing the DB between specs, this would be 3
-          docs.length.should.equal(2);
-          done();
-        });
-      });
+    card.save((err,model) =>{
+      id = model._id;
+      done();
     });
   });
 
-  // it("Can change cards attributes", function(done){
-  //     var card = new Card();
-  //     card.number = 5555555555554444
-  //     card.code = 123
-  //     card.expirationDate: "09/18"
-  //     card.save(function(err, model){
-  //       if(err) return done(err);
+  it("Cards can be listed", function(done) {  
+    Card.find({}, function(err, docs){
+      if (err) return done(err);
+      // console.log(docs);          
+      
+      docs.length.should.equal(3);
+      done();        
+    });
+  });
 
-  //       //Changing attributes and saving to DB
-  //       model.name = "Carlos";
-  //       model.lastName = "Reyna";
-  //       model. email = "other@email.com";
-  //       model.password = "newPassword";
+  it("Card has right properties", (done) =>{
+    card.should.be.instanceof(Card);
+    card.should.have.property('number').and.be.Number        
+    card.should.have.property('code').and.be.Number
+    card.should.have.property('expirationDate').and.be.String    
+    done();
+  })
 
-  //       model.save((err, savedModel) => {
-  //         //Verify changes in DB
-  //         savedModel.name.should.equal("Carlos");
-  //         savedModel.lastName.should.equal("Reyna");
-  //         savedModel.email.should.equal("other@email.com");
-  //         savedModel.password.should.equal("newPassword");
-  //         done();
-  //       })
-
-        
-
-  //     })
-  // });
-
-    
-
+  it("Can fetch cards from DB", (done) =>{
+    Card.findOne({code: 123},(err,document) =>{
+      if(err) return done(err);
+      document.should.be.an.instanceof(Card);
+      document.number.should.equal(5555555555554444);
+      document.expirationDate.should.equal("11/17");
+      done();
+    })    
+  })
+  
 });

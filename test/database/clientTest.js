@@ -1,252 +1,136 @@
 var dbUrl    = 'mongodb://localhost/apusbuy';
 var should   = require('chai').should();
 var mongoose = require('mongoose');
-// var clearDB  = require('mocha-mongoose')(dbUrl);
-var ObjectId = mongoose.Schema.Types.ObjectId;
-var helper = require('../../helpers/objectGetter');
-//models
 var Client  = require('../../models/client');
-var Card = require(('../../models/card'))
+var Card = require('../../models/card');
 var Product = require('../../models/product');
+var ObjectId = mongoose.Schema.Types.ObjectId;
+// var clearDB  = require('mocha-mongoose')(dbUrl);
 
-
-var address = {
-  street: '5th avenue',
-  postalCode: 05854,
-  number: 21,
-  state: 'Atizapan',
-  city: 'Mexico'
-}
-var card_1;
-var card_2;
-var product_1;
-var product_2;
-var product_3;
-
+var id;
+var card_id;
+var client;
+var address;
 
 describe("Client Test", function() {
-
-  //Called at the begining of this test suit
   before((done) =>{
-    //set cards
-    card_1 = new Card();
-    card_1.number = 5555555555554444;
-    card_1.code = 123;
-    card_1.expirationDate = "09/18";
+    var address = {
+      street: "5th avenue",
+      "postalCode": "05061",
+      "number": 24,
+      "state": "Atizapan",
+      "city": "Mexico"
+    };
+    var card = new Card({
+      "number": 5555555555554444,
+      "code": 123,
+      "expirationDate": "11/17"});
 
-    card_2= new Card();
-    card_2.number = 5105105105105100
-    card_2.code = 456
-    card_2.expirationDate = "12/20"
-    
-    // set products
-    product_1 = new Product();
-    product_1.name = "Overwatch";
-    product_1.description = "El mejor juego ever :D";
-    product_1.price = 699.99;
-    product_1.categories = ["Video Juegos", "PC", "Electrónicos"];
+    card.save((err,saved) =>{
+      card_id = saved._id;
+    });
 
-    product_2 = new Product({
-      name: "Audifonos Bose",
-      description: "Excelentes audífonos para uso personal",
-      price: 450,
-      categories: ["Auidifonos", "Audio"]
-      });
+    var cards = [card];
 
-    product_3 = new Product({
-      name: "Mouse Logitech Inalámbrico",
-      description: "Excelente mouse para uso personal",
-      price: 200,
-      categories: ["Mouse", "Electrónicos", "Computación"]
-      });
-
-    done();
-
-  });
-
-  after((done) =>{
-    // clearDB(done);
+    client = new Client();
+    client.name = "Carlos";
+    client.lastName = "Reyna";
+    client.email = "carlos.reyna@itesm.mx";
+    client.password = "password";
+    client.verified = true;
+    client.address = address;
+    client.cards = cards
+    client.cart.discount = 20; 
     done();
   })
 
-  
+  after((done)=>{
+    Card.remove({_id: card_id}, (err) =>{
+      if(err) return done(err);
+      Client.remove({_id: id}, (err) =>{
+        if(err) return done(err);
+        done();
+      })
+    })    
+  })
 
-  beforeEach(function(done) { //executed before each test
-    // clearDB();
+  beforeEach(function(done) {
     if (mongoose.connection.db) return done();
 
-    mongoose.connect(dbUrl);  
-    //store card 1
-    card_1.save((err, model) => {
-      if(err) return done(err);
-      //store card 2
-      card_2.save((err,model) => {
-        // store product 1
-        product_1.save((err,model) =>{
-          if(err) return done(err);
-          // store product 2
-          product_2.save((err,model) => {
-            if(err) return done(err);
-            // store product 3
-            product_3.save(done);
-          })
-        })
-      });  
-    });  
-    
+    mongoose.connect(dbUrl, done);
   });
 
-  it("Clients can be saved", function(done) {
-    var client = new Client();
-    client.name = "Carlos";
-    client.lastName = "Reyna";
-    client.email = "carlos.reyna@itesm.mx";
-    client.password = "password";
-    client.verified = true;
-    client.address = address;
-    
-    //retriving cards from DB and use them to create a client
-    Card.find((err, cards) => {
+  it("Clients can be saved", function(done) {    
+
+    client.save((err,model) =>{
       if(err) return done(err);
-      client.cards = cards
-      client.cart.orders.push({product: product_1, ammount: 5});
-      client.cart.orders.push({product: product_2, ammount: 1});
-      client.cart.orders.push({product: product_3, ammount: 9});
-      client.cart.discount = 20;  
-      // client.save(done);
-      
-    })
-    done();   
-  });
-
-  it("Client have right properties", function(done){
-    var client = new Client();
-    client.name = "Carlos";
-    client.lastName = "Reyna";
-    client.email = "carlos.reyna@itesm.mx";
-    client.password = "password";
-    client.verified = true;
-    client.address = address;
-    
-    //retriving cards from DB and use them to create a client
-    Card.find((err, cards) => {
-      if(err) return done(err);
-      client.cards = cards
-      client.cart.orders.push({product: product_1, ammount: 5});
-      client.cart.orders.push({product: product_2, ammount: 1});
-      client.cart.orders.push({product: product_3, ammount: 9});
-      client.cart.discount = 20;  
-      client.save((err,model) => {
-        if(err) return done(err);
-        //Verify properties
-        model.should.be.an.instanceof(Client);
-        model.should.have.property('name');
-        model.should.have.property('password');
-        model.should.have.property('email');
-        model.should.have.property('lastName');
-        model.should.have.property('verified');
-        model.should.have.property('address');
-        model.should.have.property('cart');        
-        model.cart.should.have.property('orders').and.be.an.instanceof(Array);
-        model.cart.should.have.property('discount');
-        model.cart.orders[0].should.have.property('product');
-        model.cart.orders[0].should.have.property('ammount');
-        
-        done();
-
-
-      });
-      
-    })
-  });
-
-  it("Can get client's product details", (done) =>{
-    var client = new Client();
-    client.name = "Carlos";
-    client.lastName = "Reyna";
-    client.email = "carlos.reyna@itesm.mx";
-    client.password = "password";
-    client.verified = true;
-    client.address = address;
-    
-    //retriving cards from DB and use them to create a client
-    Card.find((err, cards) => {
-      if(err) return done(err);
-      client.cards = cards
-      client.cart.orders.push({product: product_1, ammount: 666});
-      client.cart.orders.push({product: product_2, ammount: 1});
-      client.cart.orders.push({product: product_3, ammount: 9});
-      client.cart.discount = 20;  
-      client.save();
-      
-      console.log(helper.getClientCard(client,null));
-
+      id = model._id;
       done();
-    })
-  })
+    });
+  });
 
+  it("Clients can be modified", function(done) {    
+    Client.findOne({name: "Carlos"}, (err, storedClient) =>{
+      if(err) return done(err);
+      //got stored client -> get stored products
+      Product.find({}, (err, storedProducts) =>{
+        if(err) return done(err);
+        //got stored products -> assign them to storedClient's cart orders
+        storedProducts.forEach( function(product, i) {
+          storedClient.cart.orders.push({product: product, ammount: i+1})
+        });
+        //update storedClient
+        storedClient.save(done);
+      })
 
+    })    
+  });
 
-  // it("Clients can be listed", function(done) {
-  //   new Client({
-  //     name: "Alex",
-  //     lastName: "Rojas",
-  //     email: "alex.npc@itesm.mx",
-  //     password: "password",
-  //     role: "Recursos Humanos"
-  //     }).save(function(err, model){
+  // it("Clients can be listed", function(done) {  
+  //   Client.find({}, function(err, docs){
   //     if (err) return done(err);
-
-  //     new Client({
-  //       name: "Diego",
-  //       lastName: "Monroy",
-  //       email: "diego.monroy@itesm.mx",
-  //       password: "password",
-  //       role: "Ventas"
-  //       }).save(function(err, model){
-  //       if (err) return done(err);
-
-  //       Client.find({}, function(err, docs){
-  //         if (err) return done(err);
-
-  //         // without clearing the DB between specs, this would be 3
-  //         docs.length.should.equal(2);
-  //         done();
-  //       });
-  //     });
+  //     // console.log(docs);          
+      
+  //     docs.length.should.equal(1);
+  //     done();        
   //   });
   // });
 
-  // it("Can change clients attributes", function(done){
-  //   var client = new Client({
-  //     name: "Alex",
-  //     lastName: "Rojas",
-  //     email: "alex.npc@itesm.mx",
-  //     password: "password",
-  //     role: "Recursos Humanos"
-  //     }).save(function(err, model){
-  //       if(err) return done(err);
+  it("Can fetch clients from DB", (done) =>{
+    Client.findOne({name: "Carlos"},(err,document) =>{
+      if(err) return done(err);
+      document.should.be.an.instanceof(Client);
+      done();
+    })    
+  });
 
-  //       //Changing attributes and saving to DB
-  //       model.name = "Carlos";
-  //       model.lastName = "Reyna";
-  //       model. email = "other@email.com";
-  //       model.password = "newPassword";
+  it("Client has right properties", (done) =>{    
+    Client.findOne({name: "Carlos"}, (err,storedClient) =>{
+      if(err) return done(err);
+      storedClient.should.be.instanceof(Client);
+      storedClient.should.have.property('name').and.be.String;
+      storedClient.should.have.property('lastName').and.be.String;
+      storedClient.should.have.property('email').and.be.String;
+      storedClient.should.have.property('verified').and.be.Boolean;
+      storedClient.should.have.property('password').and.be.String;
+      storedClient.address.should.have.property('street').and.be.String;
+      storedClient.address.should.have.property('postalCode').and.be.String;
+      storedClient.address.should.have.property('number').and.be.Number;
+      storedClient.address.should.have.property('state').and.be.String;
+      storedClient.address.should.have.property('city').and.be.String;
+      storedClient.should.have.property('cards').and.be.an.instanceof(Array);
+      storedClient.should.have.property('cart');
+      //Retrive from DB card id to get properties      
+      Card.findOne({_id: storedClient.cards[0]}, (err, clientCard)=>{
+        if(err) return done(err);        
+        clientCard.should.be.instanceof(Card);
+        clientCard.should.have.property('expirationDate').and.be.String;        
+        done();
+      })
+            
+    })
+  });
 
-  //       model.save((err, savedModel) => {
-  //         //Verify changes in DB
-  //         savedModel.name.should.equal("Carlos");
-  //         savedModel.lastName.should.equal("Reyna");
-  //         savedModel.email.should.equal("other@email.com");
-  //         savedModel.password.should.equal("newPassword");
-  //         done();
-  //       })
-
-        
-
-  //     })
-  // });
-
-    
-
+  
+  
 });
