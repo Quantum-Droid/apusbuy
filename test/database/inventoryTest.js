@@ -2,105 +2,79 @@ var dbUrl    = 'mongodb://localhost/apusbuy';
 var should   = require('chai').should();
 var mongoose = require('mongoose');
 var Inventory  = require('../../models/inventory');
-var clearDB  = require('mocha-mongoose')(dbUrl);
+var Product  = require('../../models/product');
 
+var id;
+var inventory;
+var newProduct;
 
 describe("Inventory Test", function() {
+  before((done) =>{
+    newProduct = new Product();
+    newProduct.name = "Test product";
+    newProduct.description = "Test description";
+    newProduct.price = 280;
+    newProduct.categories = ["Test"];
+
+    inventory = new Inventory();
+    inventory.items.push({product: newProduct, ammount: 80});
+    done();
+  })
+
+  after((done)=>{
+    Inventory.remove({_id: id}, (err) =>{
+      if(err) return done(err);
+      done();
+    })
+  })
+
   beforeEach(function(done) {
     if (mongoose.connection.db) return done();
 
     mongoose.connect(dbUrl, done);
   });
 
-  it("Inventories can be saved", function(done) {
-    var inventory = new Inventory();
-        
-
-    inventory.save(done);
-  });
-
-  it("Inventorys have right properties", function(done){
-    var inventory = new Inventory({
-      name: "Alex",
-      lastName: "Rojas",
-      email: "alex.npc@itesm.mx",
-      password: "password",
-      role: "Recursos Humanos"
-      }).save(function(err, model){
-        if(err) return done(err);
-        
-        model.should.be.an.instanceof(Inventory);
-        model.should.have.property('name');
-        model.should.have.property('password');
-        model.should.have.property('email');
-        model.should.have.property('lastName');
-        model.should.have.property('role');
-        
+  it("Inventorys can be saved", function(done) {    
+    newProduct.save((err,model) =>{
+      inventory.save((err,model) =>{
+        id = model._id;      
         done();
-
       });
+    })    
   });
 
-  it("Inventorys can be listed", function(done) {
-    new Inventory({
-      name: "Alex",
-      lastName: "Rojas",
-      email: "alex.npc@itesm.mx",
-      password: "password",
-      role: "Recursos Humanos"
-      }).save(function(err, model){
+  it("Inventorys can be listed", function(done) {  
+    Inventory.find({}, function(err, docs){
       if (err) return done(err);
-
-      new Inventory({
-        name: "Diego",
-        lastName: "Monroy",
-        email: "diego.monroy@itesm.mx",
-        password: "password",
-        role: "Ventas"
-        }).save(function(err, model){
-        if (err) return done(err);
-
-        Inventory.find({}, function(err, docs){
-          if (err) return done(err);
-
-          // without clearing the DB between specs, this would be 3
-          docs.length.should.equal(2);
-          done();
-        });
-      });
+      // console.log(docs);          
+      
+      docs.length.should.equal(2);
+      done();        
     });
   });
 
-  // it("Can change inventorys attributes", function(done){
-  //   var inventory = new Inventory({
-  //     name: "Alex",
-  //     lastName: "Rojas",
-  //     email: "alex.npc@itesm.mx",
-  //     password: "password",
-  //     role: "Recursos Humanos"
-  //     }).save(function(err, model){
-  //       if(err) return done(err);
+  it("Inventory has right properties", (done) =>{
+    inventory.should.be.instanceof(Inventory);
+    inventory.should.have.property('items').and.be.an.instanceof(Array)
+    // inventory.items.should.not.be.empty
+    inventory.items[0].should.have.property('product').and.be.Number;
+    inventory.items[0].should.have.property('ammount').and.be.Number;
 
-  //       //Changing attributes and saving to DB
-  //       model.name = "Carlos";
-  //       model.lastName = "Reyna";
-  //       model. email = "other@email.com";
-  //       model.password = "newPassword";
+    done();
+  })
 
-  //       model.save((err, savedModel) => {
-  //         //Verify changes in DB
-  //         savedModel.name.should.equal("Carlos");
-  //         savedModel.lastName.should.equal("Reyna");
-  //         savedModel.email.should.equal("other@email.com");
-  //         savedModel.password.should.equal("newPassword");
-  //         done();
-  //       })
-
-        
-
-  //     })
-  // });
-
-    
-
+  it("Can fetch inventorys from DB", (done) =>{    
+    Inventory.findOne({_id: id},(err,document) =>{
+      if(err) return done(err);
+      document.should.be.an.instanceof(Inventory);      
+      Product.findOne({_id: document.items[0].product}, (err, prod) =>{
+        if(err) return done(err);
+        prod.should.be.instanceof(Product)
+        prod.name.should.equal(newProduct.name)
+        prod.categories.should.be.instanceof(Array);
+        done();
+      });
+    })    
+  })
+  
 });
