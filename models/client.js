@@ -16,13 +16,12 @@ var clientSchema = mongoose.Schema({
 		state: String,
 		city: String,
 	},
-	cards: [ObjectId],
+	cards: [{type: ObjectId, ref: 'Card'}],
 	cart: {
-		orders: {product: ObjectId, ammount: Number},
-		discount: {Number},
-		creationDate: Timestamp
+		orders: [{product: {type: ObjectId, ref: 'Product'}, ammount: Number}],
+		discount: Number,		
 	}
 	
-})
+}, {timestamps: true});
 
 module.exports = mongoose.model('Client', clientSchema);	

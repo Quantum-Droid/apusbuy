@@ -29,7 +29,7 @@ describe("Product Test", function() {
       description: "Excelentes audífonos para uso personal",
       price: 450,
       categories: ["Auidifonos", "Audio"]
-      }).save(function(err, model){
+    }).save(function(err, model){
       if (err) return done(err);
 
       new Product({
@@ -37,13 +37,13 @@ describe("Product Test", function() {
         description: "Excelente mouse para uso personal",
         price: 200,
         categories: ["Mouse", "Electrónicos", "Computación"]
-        }).save(function(err, model){
+      }).save(function(err, model){
         if (err) return done(err);
 
         Product.find({}, function(err, docs){
           if (err) return done(err);
-
-          // without clearing the DB between specs, this would be 3
+          // console.log(docs);          
+          
           docs.length.should.equal(2);
           done();
         });

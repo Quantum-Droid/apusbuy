@@ -8,4 +8,4 @@ var cardSchema = mongoose.Schema({
 	expirationDate: String
 })
 
-module.exports = mongoose.model('Admin', cardSchema);	
+module.exports = mongoose.model('Card', cardSchema);	
