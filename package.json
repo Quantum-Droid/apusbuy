@@ -2,10 +2,8 @@
   "name": "ApusBuy",
   "version": "0.0.1",
   "private": true,
-  "scripts": {
-    "test": "./node_modules/.bin/mocha --reporter spec"
-  },
   "dependencies": {
+    "async": "^2.0.0-rc.6",
     "body-parser": "^1.0.2",
     "bootstrap": "^3.3.6",
     "chai": "^3.5.0",

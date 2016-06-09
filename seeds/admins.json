@@ -1,0 +1,24 @@
+[
+  {
+    "name": "Alex",
+    "lastName": "Rojas",
+    "email": "alex.npc@itesm.mx",
+    "password": "password",
+    "role": "Recursos Humanos"
+  },
+
+  {
+    "name": "Diego",
+    "lastName": "Monroy",
+    "email": "diego.monroy@itesm.mx",
+    "password": "password",
+    "role": "Ventas"
+  },
+  {
+    "name": "Carlos",
+    "lastName": "Reyna",
+    "email": "carlos.reyna@itesm.mx",
+    "password": "password",
+    "role": "Super User"
+  }
+]

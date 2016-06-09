@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Laptop Dell",
+    "description": "Latop muy cool",
+    "price": 3500,
+    "categories": ["Electronicos", "Cómputo", "Gadgets"]
+  },
+  {
+    "name": "Audifonos Bose",
+    "description": "Audifonos muy cool",
+    "price": 760.99,
+    "categories": ["Electronicos", "Audio", "Gadgets"]
+  },
+  {
+    "name": "Funda iPhone 6S",
+    "description": "Funda muy cool",
+    "price": 200,
+    "categories": ["Accsesorio", "Gadgets"]
+  }
+]

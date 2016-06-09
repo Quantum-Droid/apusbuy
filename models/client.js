@@ -8,10 +8,10 @@ var clientSchema = mongoose.Schema({
 	lastName: String,
 	email: String,
 	verified: Boolean,
-	passwordDigest: String,
+	password: String,
 	address: {
 		street: String,
-		postalCode: Number,
+		postalCode: String,
 		number: Number,
 		state: String,
 		city: String,
@@ -19,9 +19,9 @@ var clientSchema = mongoose.Schema({
 	cards: [{type: ObjectId, ref: 'Card'}],
 	cart: {
 		orders: [{product: {type: ObjectId, ref: 'Product'}, ammount: Number}],
-		discount: Number,		
+		discount: {type: Number, default: 0},		
 	}
 	
 }, {timestamps: true});
 
-module.exports = mongoose.model('Client', clientSchema);	
+module.exports = mongoose.model('Client', clientSchema);	         
