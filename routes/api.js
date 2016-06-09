@@ -10,12 +10,35 @@ var ObjectId = require('mongoose').Types.ObjectId;
 var Client  = require('../models/client');
 var Admin = require('../models/admin');
 var Product = require('../models/product');
+var nodemailer = require('nodemailer');
 
 module.exports = router;
 
 //register
-function sendVerification(){
+function sendVerification(id, email){
 	console.log("Sending verification...");
+	console.log(id);
+	console.log(email);
+	var transporter = nodemailer.createTransport({
+		service: "Gmail",
+		auth: {
+			user: "apusbuy@gmail.com",
+			pass: "123qwe123asd"
+		}
+	});
+	var mailOptions = {
+		to: email,
+		subject: 'Verify your account',
+		text: 'Hello there we are glad you had joined Apusbuy. Now before you can start buying with your account just write this code:'+ id +' on your profile so we can verify this is your email.'
+	};
+	transporter.sendMail(mailOptions, function(err, info){
+		if(!err){
+			console.log('Message sent: ' + info.response);
+		}else{
+			console.log(err);
+		}
+	});
+	
 }
 
 //send id writtem by the user in the body
@@ -59,7 +82,7 @@ router.post('/register', (req, res) => {
   client.save((err, obj) => {
   	if (!err) {
   		console.log(obj.name + 'saved.');  		
-  		sendVerification();
+  		sendVerification(obj._id, obj.email);
   		res.json(client);
   	}  	
   }); 
