@@ -14,7 +14,7 @@ var nodemailer = require('nodemailer');
 
 module.exports = router;
 
-//register
+//send mail verification
 function sendVerification(id, email){
 	console.log("Sending verification...");
 	console.log(id);
@@ -41,18 +41,20 @@ function sendVerification(id, email){
 	
 }
 
-//send id writtem by the user in the body
+//send id written by the user in the body
 router.put('/verify',(req, res) => {
 	Client.findOne({_id: new ObjectId(req.body._id)},
 	(err, client) => {
-		if(!err) console.log(client + ' found.');
-		client.verified = true;		
-		client.save((err, obj) => {
-			if (!err) {
-				console.log(obj.name + ' saved.');  		
-				res.json(client);
-			}  	
-  	});
+		if(!err){
+			console.log(client + ' found.');
+			client.verified = true;		
+			client.save((err, obj) => {
+				if (!err) {
+					console.log(obj.name + ' saved.');  		
+					res.json(obj);
+				}  	
+  		});
+		}
 	});
 });
 
@@ -81,9 +83,46 @@ router.post('/register', (req, res) => {
   
   client.save((err, obj) => {
   	if (!err) {
-  		console.log(obj.name + 'saved.');  		
+  		console.log(obj.name + ' saved.');
   		sendVerification(obj._id, obj.email);
-  		res.json(client);
+  		res.json(obj);
+  	}
+  }); 
+});
+
+//create accounts for the different managment roles
+//send name, lastname, email password and role in hte body
+router.post('/adminCreation', (req, res) => {
+	
+	var admin = new Admin();
+  admin.name = req.body.name;
+  admin.lastName = req.body.lastName;
+  admin.email = req.body.email;
+  admin.password = req.body.password;
+  admin.role = req.body.role
+  
+  admin.save((err, obj) => {
+  	if (!err) {
+  		console.log(obj.name + ' saved as admin.');  		
+  		res.json(obj);
+  	}  	
+  }); 
+});
+
+//create products send name, description, price, image, categories in the body
+router.post('/productCreation', (req, res) => {
+
+	var product = new Product();
+  product.name = req.body.name;
+  product.description = req.body.description;
+  product.price = req.body.price;
+  product.image = req.body.iamge;
+  product.categories = req.body.categories;
+  
+  product.save((err, obj) => {
+  	if (!err) {
+  		console.log(obj.name + ' saved new product.');
+  		res.json(obj);
   	}  	
   }); 
 });
@@ -94,8 +133,10 @@ router.post('/clientLogin', (req, res) => {
 		{email: req.body.email, 
 		passwordDigest: req.body.password}, 
 	(err, client) => {
-		if(!err)console.log(client + 'found.');
-		res.json(client);		
+		if(!err){
+			console.log(client + ' found.');
+			res.json(client);
+		}
 	});	
 });
 
@@ -106,17 +147,8 @@ router.post('/adminLogin', (req, res) => {
 		password: req.body.password}, 
 	(err, admin) => {
 		if(!err)console.log(admin + 'found.');
-		res.json(admin);		
+		res.json(admin);
 	});	
-});
-
-//get product information send product _id as a parameter
-router.get('/productInfo', (req, res) => {
-	Product.findOne({_id: new ObjectId(req.param('id'))},
-	(err, product) => {
-		if(!err) console.log(product + ' found.');
-		res.json(product);
-	});
 });
 
 //get client information send client _id as a parameter
@@ -128,28 +160,156 @@ router.get('/clientInfo', (req, res) => {
 	});
 });
 
+//get admin information send admin _id as a parameter
+router.get('/adminInfo', (req, res) => {
+	Admin.findOne({_id: new ObjectId(req.param('_id'))},
+	(err, admin) => {
+		if(!err) console.log(admin + ' found.');
+		res.json(admin);
+	});
+});
+
+//get product information send product _id as a parameter
+router.get('/productInfo', (req, res) => {
+	Product.findOne({_id: new ObjectId(req.param('id'))},
+	(err, product) => {
+		if(!err) console.log(product + ' found.');
+		res.json(product);
+	});
+});
+
+//get all clients
+router.get('/clients', (req, res) => {
+	Client.find({}, (err, clients) => {
+		if(!err) console.log(clients + ' found.');
+		res.json(clients);
+	});
+});
+
+//get all admins
+router.get('/admins', (req, res) => {
+	Admin.find({}, (err, admins) => {
+		if(!err) console.log(admins + ' found.');
+		res.json(admins);
+	});
+});
+
+//get all products
+router.get('/products', (req, res) => {
+	Product.find({}, (err, products) => {
+		if(!err) console.log(products + ' found.');
+		res.json(products);
+	});
+});
+
 //modifiy client information send client updated information in the body
-//does not change email and password
 router.put('/modifyClient', (req, res) => {
 	Client.findOne({_id: new ObjectId(req.body._id)},
 	(err, client) => {
-		if(!err) console.log(client + ' found.');
-		client.name = req.body.name;
-		client.lastName = req.body.lastName;
-		client.address.street = req.body.street,
-  	client.address.postalCode = req.body.postalCode,
-  	client.address.number = req.body.number,
-  	client.address.state = req.body.state,
-  	client.address.city = req.body.city
-		client.cards = req.body.cards;
+		if(!err){
+			console.log(client + ' found.');
+			client.name = req.body.name;
+			client.lastName = req.body.lastName;
+			client.password = req.body.password;
+			client.address.street = req.body.street,
+			client.address.postalCode = req.body.postalCode,
+			client.address.number = req.body.number,
+			client.address.state = req.body.state,
+			client.address.city = req.body.city
+			client.cards = req.body.cards;
 		
-		client.save((err, obj) => {
-			if (!err) {
-				console.log(obj.name + ' saved.');  		
-				sendVerification();
-				res.json(client);
-			}  	
-  	});
+			if(client.email !== req.body.email){
+				client.verified = false;
+				client.email = req.body.email;
+				console.log(client.name + " needs to verify at " + client.email);
+				sendVerification(client._id, client.email);
+			}
+
+			client.save((err, obj) => {
+				if (!err) {
+					console.log(obj.name + ' saved.');  		
+					sendVerification();
+					res.json(obj);
+				}  	
+			});
+		}
+	});
+});
+
+//modifiy admin information send admin updated information in the body
+router.put('/modifyAdmin', (req, res) => {
+	Admin.findOne({_id: new ObjectId(req.body._id)},
+	(err, admin) => {
+		if(!err){
+			console.log(admin + ' found.');
+			admin.name = req.body.name;
+			admin.lastName = req.body.lastName;
+			admin.email = req.body.email;
+			admin.password = req.body.password;
+			admin.role = req.body.role;
+
+			admin.save((err, obj) => {
+				if (!err) {
+					console.log(obj.name + ' saved.');
+					res.json(obj);
+				}  	
+			});
+		}
+	});
+});
+
+//modifiy product information send id name description price image categories[]
+router.put('/modifyProduct', (req, res) => {
+	Product.findOne({_id: new ObjectId(req.body._id)},
+	(err, product) => {
+		if(!err){
+			console.log(product + ' found.');
+			product.name = req.body.name;
+			product.description = req.body.description;
+			product.price = req.body.price;
+			product.image = req.body.image;
+			product.categories = req.body.categories;
+
+			product.save((err, obj) => {
+				if (!err) {
+					console.log(obj.name + ' saved.');
+					res.json(obj);
+				}  	
+			});
+		}
+	});
+});
+
+//delete client by id in body
+router.delete('/deleteClient', (req, res) => {
+	Client.remove({_id: new ObjectId(req.body._id)},
+	(err, obj) => {
+		if(!err){
+			console.log(obj.n+' object was removed from the database.');
+			res.json(obj);
+		}
+	});
+});
+
+//delete admin by id in body
+router.delete('/deleteAdmin', (req, res) => {
+	Admin.remove({_id: new ObjectId(req.body._id)},
+	(err, obj) => {
+		if(!err){
+			console.log(obj.n + 'object was removed from the database.');
+			res.json(obj);
+		}
+	});
+});
+
+//delete product by id in body
+router.delete('/deleteProduct', (req, res) => {
+	Product.remove({_id: new ObjectId(req.body._id)},
+	(err, obj) => {
+		if(!err){
+			console.log(obj.n+'object was removed from the database.');
+			res.json(obj);
+		}
 	});
 });
 
