@@ -3,25 +3,42 @@
 /* Controllers */
 
 angular.module('myApp.controllers', []).
-  controller('AppCtrl', function ($scope, $http) {
-
-    $http({
-      method: 'GET',
-      url: '/api/name'
-    }).
-    success(function (data, status, headers, config) {
-      $scope.name = data.name;
-    }).
-    error(function (data, status, headers, config) {
-      $scope.name = 'Error!';
-    });
+  controller('Controller_MainMenu', function ($scope) {
 
   }).
-  controller('MyCtrl1', function ($scope) {
+  controller('Controller_UserLogin', function ($scope) {
     // write Ctrl here
 
   }).
-  controller('MyCtrl2', function ($scope) {
+  controller('Controller_AdminLogin', function ($scope) {
+    // write Ctrl here
+
+  }).
+  controller('Controller_UserProfile', function ($scope) {
+    // write Ctrl here
+
+  }).
+  controller('Controller_ProductDetail', function ($scope) {
+    // write Ctrl here
+
+  }).
+  controller('Controller_UserShoppingCart', function ($scope) {
+    // write Ctrl here
+
+  }).
+  controller('Controller_AdminSalesmen', function ($scope) {
+    // write Ctrl here
+
+  }).
+  controller('Controller_HR', function ($scope) {
+    // write Ctrl here
+
+  }).
+  controller('Controller_Superuser', function ($scope) {
+    // write Ctrl here
+
+  }).
+  controller('Controller_ProductAnalysis', function ($scope) {
     // write Ctrl here
 
   });
