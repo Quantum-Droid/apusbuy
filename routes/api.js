@@ -7,10 +7,17 @@
 const express = require('express');
 const router = express.Router();
 var ObjectId = require('mongoose').Types.ObjectId;
+var nodemailer = require('nodemailer');
+/** Models ***/
 var Client  = require('../models/client');
 var Admin = require('../models/admin');
 var Product = require('../models/product');
-var nodemailer = require('nodemailer');
+var Inventory = require('../models/inventory');
+
+const CLIENT_NOT_FOUND_ERROR = "Could not find client in the DB.";
+const PRODUCT_NOT_FOUND_ERROR = "Could not find product in the DB."
+const INVENTORY_NOT_FOUND_ERROR = "Could not fund inventory in the DB."
+const INVALID_PARAMS_ERROR = "Invalid parameters."
 
 module.exports = router;
 
@@ -37,8 +44,21 @@ function sendVerification(id, email){
 		}else{
 			console.log(err);
 		}
-	});
-	
+	});	
+}
+
+//check if query params are valid (not null|undefined)
+function validParams (params) {	
+	for(var param in params){
+		if(!params[param])
+			return false;
+	}
+	return true;
+}
+
+//Creates an error JSON object with msg description
+function responseError(msg) {
+	return {'error': msg};
 }
 
 //send id written by the user in the body
@@ -312,6 +332,103 @@ router.delete('/deleteProduct', (req, res) => {
 		}
 	});
 });
+
+//get client cart
+router.get('/cart', (req,res) =>{
+	var id = req.query
+	Client.findOne({_id: id}, (err,client) =>{
+		if(!err){
+			if(client)
+				res.json(client.cart)
+			else
+				res.json({error: 'Client not found'})			
+		}else{
+			res.json({error: err})
+		}
+	})
+});
+
+//add or remove products to/from client's cart
+router.put('/cart', (req,res) =>{
+	if(validParams(req.body) && validParams(req.query)){
+		var id = ObjectId(req.query._id);
+		var productId = ObjectId(req.body.product);
+		var ammount = req.body.ammount;
+		var action = req.body.action;	
+		Client.findOne(id,(err, client) =>{ //get client from DB			
+			if(!err && client){ //client found
+				Product.findOne(productId, (err, product) =>{ //get product from DB
+					if(!err && product){ //product found
+						client.cart.orders.push({"product": product, "ammount": ammount});
+						client.save((err, savedClient) =>{ //update client in DB.
+							if(!err){
+								res.json(savedClient);
+							}else res.json(err);
+						})
+					}else res.json(responseError(PRODUCT_NOT_FOUND_ERROR));
+				})
+			}else res.json(responseError(CLIENT_NOT_FOUND_ERROR));			
+		})
+	}else res.json(responseError(INVALID_PARAMS_ERROR))
+	
+});
+
+//Clears a client's cart
+router.delete('/cart', (req,res) =>{
+	var id = req.query._id;
+	Client.findOne({_id: id}, (err, client) =>{
+		if(!err){
+			if(client){
+				client.cart = {					
+						orders: [],
+						discount: 0					
+				};
+				client.save((err, savedClient) =>{
+					if(!err && savedClient) res.json(savedClient);
+					else res.json(responseError("Could not delete client's cart"))
+				})
+			}else res.json(responseError('Could not found client.'));
+		}else res.json(responseError(err));
+	})
+});
+
+/*Represents a sale. Clears client's cart and
+updates bought items from Inventory*/
+router.put('/checkout', (req,res) =>{
+	if (validParams(req.query)){
+		var id = ObjectId(req.query._id);
+		Client.findOne({_id: id}, (err, client) =>{
+			if(!err){ //no error
+				if(client){	//client found										
+					Inventory.findOne((err,inventory) =>{ //get inventory
+						if(!err && inventory){
+							//Search products in inventory
+							for (var i = inventory.items.length - 1; i >= 0; i--) {
+								for (var j = client.cart.orders.length - 1; j >= 0; j--) {									
+									if(inventory.items[i].product.toString() === 
+										client.cart.orders[j].product.toString()){
+										//found product in inventory -> update ammounts available
+										inventory.items[i].ammount -= client.cart.orders[j].ammount;										
+									}
+								}	
+							}
+							inventory.save((err, savedInventory) =>{ //save inventory
+								//clear client's cart
+								client.cart.orders = [];
+								client.cart.discount = 0;
+								client.save((err,savedClient) =>{
+									if(!err) res.json(savedClient);
+								})
+							})
+						}else res.json(responseError(INVENTORY_NOT_FOUND_ERROR))
+					})								
+				}else res.json(responseError(CLIENT_NOT_FOUND_ERROR));
+			}else res.json(responseError(err));
+		});
+	}else res.json(responseError('Invalid params'));
+});
+
+
 
 //Test
 router.get('/test', (req, res) => {	
