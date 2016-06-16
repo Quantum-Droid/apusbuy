@@ -394,7 +394,7 @@ router.delete('/cart', (req,res) =>{
 
 /*Represents a sale. Clears client's cart and
 updates bought items from Inventory*/
-router.put('/checkout', (req,res) =>{
+router.post('/checkout', (req,res) =>{
 	if (validParams(req.query)){
 		var id = ObjectId(req.query._id);
 		Client.findOne({_id: id}, (err, client) =>{
@@ -408,11 +408,14 @@ router.put('/checkout', (req,res) =>{
 									if(inventory.items[i].product.toString() === 
 										client.cart.orders[j].product.toString()){
 										//found product in inventory -> update ammounts available
-										inventory.items[i].ammount -= client.cart.orders[j].ammount;										
+										console.log(inventory.items)
+										inventory.items[i].ammount -= client.cart.orders[j].ammount;																												
 									}
 								}	
 							}
 							inventory.save((err, savedInventory) =>{ //save inventory
+								//increase client's bought items field
+								client.boughtItems += client.cart.orders.length
 								//clear client's cart
 								client.cart.orders = [];
 								client.cart.discount = 0;
