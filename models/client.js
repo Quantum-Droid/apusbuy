@@ -16,11 +16,16 @@ var clientSchema = mongoose.Schema({
 		state: String,
 		city: String,
 	},
-	cards: [{type: ObjectId, ref: 'Card'}],
+	cards: [{
+		number: String,
+		code: String,
+		expirationDate: String
+	}],
 	cart: {
 		orders: [{product: {type: ObjectId, ref: 'Product'}, ammount: Number}],
 		discount: {type: Number, default: 0},		
-	}
+	},
+	boughtItems: {type: Number, default: 0}		
 	
 }, {timestamps: true});
 
