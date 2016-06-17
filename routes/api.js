@@ -18,6 +18,13 @@ const CLIENT_NOT_FOUND_ERROR = "Could not find client in the DB.";
 const PRODUCT_NOT_FOUND_ERROR = "Could not find product in the DB."
 const INVENTORY_NOT_FOUND_ERROR = "Could not fund inventory in the DB."
 const INVALID_PARAMS_ERROR = "Invalid parameters."
+const FIRST_DISCOUNT = 10; //10% discount
+const FIRST_DISCOUNT_REQUIREMENT = 5; //5 bought items needed for first discount
+const SECOND_DISCOUNT = 20;//20% discount
+const SECOND_DISCOUNT_REQUIREMENT = 10;//10 bought items needed for first discount
+const THIRD_DISCOUNT = 30; //30% discount
+var THIRD_DISCOUNT_REQUIREMENT = 20; //20 bought items needed for first discount
+
 
 module.exports = router;
 
@@ -348,31 +355,6 @@ router.get('/cart', (req,res) =>{
 	})
 });
 
-//add or remove products to/from client's cart
-router.put('/cart', (req,res) =>{
-	if(validParams(req.body) && validParams(req.query)){
-		var id = ObjectId(req.query._id);
-		var productId = ObjectId(req.body.product);
-		var ammount = req.body.ammount;
-		var action = req.body.action;	
-		Client.findOne(id,(err, client) =>{ //get client from DB			
-			if(!err && client){ //client found
-				Product.findOne(productId, (err, product) =>{ //get product from DB
-					if(!err && product){ //product found
-						client.cart.orders.push({"product": product, "ammount": ammount});
-						client.save((err, savedClient) =>{ //update client in DB.
-							if(!err){
-								res.json(savedClient);
-							}else res.json(err);
-						})
-					}else res.json(responseError(PRODUCT_NOT_FOUND_ERROR));
-				})
-			}else res.json(responseError(CLIENT_NOT_FOUND_ERROR));			
-		})
-	}else res.json(responseError(INVALID_PARAMS_ERROR))
-	
-});
-
 //Clears a client's cart
 router.delete('/cart', (req,res) =>{
 	var id = req.query._id;
@@ -392,6 +374,43 @@ router.delete('/cart', (req,res) =>{
 	})
 });
 
+//add or remove products to/from client's cart
+router.put('/cart', (req,res) =>{
+	if(validParams(req.body) && validParams(req.query)){
+		var id = ObjectId(req.query._id);
+		var productId = ObjectId(req.body.product);
+		var ammount = req.body.ammount;
+		var action = req.body.action;	
+		Client.findOne(id,(err, client) =>{ //get client from DB			
+			if(!err && client){ //client found
+				if(action === "add"){ //add product to client's cart
+					Product.findOne(productId, (err, product) =>{ //get product from DB
+						if(!err && product){ //product found
+							client.cart.orders.push({"product": product, "ammount": ammount});
+							client.save((err, savedClient) =>{ //update client in DB.
+								if(!err){
+									res.json(savedClient);
+								}else res.json(err);
+							})
+						}else res.json(responseError(PRODUCT_NOT_FOUND_ERROR));
+					})
+				}
+				if(action === "remove"){
+					client.cart.orders.forEach((order, index) =>{
+						if(order.product == productId.toString()){
+							client.cart.orders.splice(index, 1);							
+						}						
+					})
+					client.save((err, savedClient) =>{
+							if(!err) res.json(savedClient);
+							else res.json(responseError(err));
+						})
+				}
+			}else res.json(responseError(CLIENT_NOT_FOUND_ERROR));			
+		})
+	}else res.json(responseError(INVALID_PARAMS_ERROR))	
+});
+
 /*Represents a sale. Clears client's cart and
 updates bought items from Inventory*/
 router.post('/checkout', (req,res) =>{
@@ -407,18 +426,33 @@ router.post('/checkout', (req,res) =>{
 								for (var j = client.cart.orders.length - 1; j >= 0; j--) {									
 									if(inventory.items[i].product.toString() === 
 										client.cart.orders[j].product.toString()){
-										//found product in inventory -> update ammounts available
-										console.log(inventory.items)
+										//found product in inventory -> update ammounts available										
 										inventory.items[i].ammount -= client.cart.orders[j].ammount;																												
 									}
 								}	
 							}
-							inventory.save((err, savedInventory) =>{ //save inventory
+							//save inventory TO db
+							inventory.save((err, savedInventory) =>{
+								//set disccount if needed
+								switch (client.boughtItems) {
+									case FIRST_DISCOUNT_REQUIREMENT:
+										client.cart.discount = FIRST_DISCOUNT;
+										break;
+									case SECOND_DISCOUNT_REQUIREMENT:
+										client.cart.discount = SECOND_DISCOUNT;
+										break;
+									case THIRD_DISCOUNT_REQUIREMENT:
+										client.cart.discount = THIRD_DISCOUNT;
+										THIRD_DISCOUNT_REQUIREMENT += THIRD_DISCOUNT_REQUIREMENT;
+										break;
+									default:																				
+										client.cart.discount = 0;
+										break;				
+								}
 								//increase client's bought items field
 								client.boughtItems += client.cart.orders.length
 								//clear client's cart
-								client.cart.orders = [];
-								client.cart.discount = 0;
+								client.cart.orders = [];								
 								client.save((err,savedClient) =>{
 									if(!err) res.json(savedClient);
 								})
@@ -440,3 +474,4 @@ router.get('/test', (req, res) => {
     name: n
   });
 });
+ 
