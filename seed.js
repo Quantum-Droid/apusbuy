@@ -37,7 +37,7 @@ function startSeeding() {
 	db.once('open', () =>{
 		clearDB();
 		seed('products');
-		seed('cards');
+		// seed('cards');
 		seed('admins');
 		seedClient();
 		seedInventory();

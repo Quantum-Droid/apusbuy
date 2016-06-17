@@ -21,26 +21,37 @@ db.once('open', () =>{
 	Client.remove({}, () =>{		
 		var client = new Client();
 		client.name = "Steve";
-    client.lastName = "Mc Stevens";
-    client.email = "steve.stevenson@itesm.mx";
-    client.password = "topKek";
-    client.verified = true;
-    client.address = address;    
-    client.cart.discount = 0;
+        client.lastName = "Mc Stevens";
+        client.email = "steve.stevenson@itesm.mx";
+        client.password = "topKek";
+        client.verified = true;
+        client.address = address;        
+        client.cards = [
+            {
+                "number": 5555555555554444,
+                "code": 123,
+                "expirationDate": "11/17"
+            },
+            {
+                "number": 5105105105105100,
+                "code": 456,
+                "expirationDate": "08/19"
+            }
+        ],
+        client.cart.discount = 0;
+        Product.find().exec((err,products) =>{
+            if(!err && products.length){
+                async.eachSeries(products, (product, callback) =>{
+                    client.cart.orders.push({product: product._id, ammount: 1});
+                    client.save((err,c) =>{
+                        callback();
+                    });
+                }, (err) =>{
+                    console.log('Clients seeded');
+                    process.exit();
+                })
+            }
+        })
 
-    //assign saved cards to client
-    Card.find().exec((err, cards) =>{
-    	if(!err && cards.length){
-    		client.cards = cards;
-    		//asign one existing product to client cart
-    		Product.findOne().exec((err, product) =>{
-    			client.cart.orders.push({product: product, ammount: 5});
-    			client.save((err,c) =>{
-    				console.log('Client seed finished');
-    				process.exit();
-    			})
-    		})
-    	}
-    })
 	});
 });
