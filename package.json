@@ -18,6 +18,7 @@
     "mocha-mongoose": "^1.2.0",
     "mongoose": "^4.2.3",
     "morgan": "~1.5.1",
+    "nodemailer": "^2.4.2",
     "remodal": "^1.0.7",
     "request": "^2.65.0",
     "serve-favicon": "~2.2.0"
