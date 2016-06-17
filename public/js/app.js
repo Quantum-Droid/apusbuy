@@ -55,20 +55,18 @@ config(function ($stateProvider, $urlRouterProvider) {
       templateUrl: 'partials/admin_superuser.html',
       controller: 'Controller_AdminSuperuser'
     }).
+    // Product
     state('product_analysis', {
       url: '/product_analysis',
       templateUrl: 'partials/product_analysis.html',
       controller: 'Controller_ProductAnalysis'
     }).
-    // Product
     state('product_detail', {
       url: '/product_detail',
       templateUrl: 'partials/product_detail.html',
       controller: 'Controller_ProductDetail'
-    }).
-    otherwise({
-      redirectTo: '/main_menu'
-    });
+    })
 
-  $locationProvider.html5Mode(true);
+    // For unmatched states
+    $urlRouterProvider.otherwise('/main_menu');
 });

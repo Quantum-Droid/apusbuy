@@ -1,1 +1,18 @@
-user_login.html
+<div>
+	<h3>
+		Inicio de sesión
+	</h3>
+	<p>
+		<form name="user_login_form" novalidate>
+			<!-- Maybe change input to EMAIL? -->
+			Usuario: <input type="text" name="username" ng-model="username" ng-required="true"/>
+			<span class="error-message" ng-show="user_login_form.username.$dirty && user_login_form.username.$error.required">
+				Por favor introduzca su usuario.
+			 </span>
+			 Contraseña: <input type="text" name="password" ng-model="password" ng-required="true"/>
+			 <span class="error-message" ng-show="user_login_form.password.$dirty && user_login_form.password.$error.required">
+			 	Por favor introduzca su contraseña.
+			 </span>
+		</form>
+	</p>
+</div>
