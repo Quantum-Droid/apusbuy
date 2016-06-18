@@ -186,11 +186,11 @@ router.put('/admin', (req, res) => {
 	(err, admin) => {
 		if(!err && admin){
 			console.log(admin + ' found.');
-			admin.name = req.body.name;
-			admin.lastName = req.body.lastName;
-			admin.email = req.body.email;
-			admin.password = req.body.password;
-			admin.role = req.body.role;
+			admin.name = req.body.name ? req.body.name : admin.name;
+			admin.lastName = req.body.lastName ? req.body.lastName : admin.lastName;
+			admin.email = req.body.email ? req.body.email : admin.email;
+			admin.password = req.body.password ? req.body.password : admin.password;
+			admin.role = req.body.role ? req.body.role : admin.role;
 
 			admin.save((err, obj) => {
 				if (!err) {
@@ -281,11 +281,11 @@ router.put('/product', (req, res) => {
 	(err, product) => {
 		if(!err && product){
 			console.log(product + ' found.');
-			product.name = req.body.name;
-			product.description = req.body.description;
-			product.price = req.body.price;
-			product.image = req.body.image;
-			product.categories = req.body.categories;
+			product.name = req.body.name ? req.body.name : product.name;
+			product.description = req.body.description ? req.body.description : product.description;
+			product.price = req.body.price ? req.body.price : product.price;
+			product.image = req.body.image ? req.body.image : product.image;
+			product.categories = req.body.categories ? req.body.categories : product.categories;
 
 			product.save((err, obj) => {
 				if (!err) {
@@ -348,15 +348,15 @@ router.put('/client', (req, res) => {
 	Client.findOne({_id: new ObjectId(req.query._id)},
 	(err, client) => {
 		if(!err && client){			
-			client.name = req.body.name;
-			client.lastName = req.body.lastName;
-			client.password = req.body.password;
-			client.address.street = req.body.street,
-			client.address.postalCode = req.body.postalCode,
-			client.address.number = req.body.number,
-			client.address.state = req.body.state,
-			client.address.city = req.body.city
-			client.cards = req.body.cards;
+			client.name = req.body.name ? req.body.name : client.name;
+			client.lastName = req.body.lastName ? req.body.lastName : client.lastName;
+			client.password = req.body.password ? req.body.password : client.password;
+			client.address.street = req.body.street ? req.body.street : client.address.street;
+			client.address.postalCode = req.body.postalCode ? req.body.postalCode : client.address.postalCode;
+			client.address.number = req.body.number ? req.body.number : client.address.number;
+			client.address.state = req.body.state ? req.body.state : client.address.state;
+			client.address.city = req.body.city ? req.body.city : client.address.city;
+			client.cards = req.body.cards ?req.body.cards : client.cards;
 		
 			if(client.email !== req.body.email){
 				client.verified = false;
