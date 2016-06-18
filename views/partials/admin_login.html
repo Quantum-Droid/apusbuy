@@ -1,1 +1,24 @@
-admin_login.html
+<div>
+	<!-- Template for admin login (admin can be vendedor (salesman), recursos humanos (HR) or superusuario (superuser)). -->
+	<h3>
+		Inicio de sesión (administrador)
+	</h3>
+	<p>
+		Utilice este portal para iniciar sesión como administrador (vendedor, recursos humanos o superusuario).
+	</p>
+	<p>
+		<form name="user_login_form" novalidate>
+			<!-- Maybe change input to EMAIL? -->
+			Usuario (Admin): <input type="text" name="admin" ng-model="admin" ng-required="true"/>
+			<span class="error-message" ng-show="user_login_form.admin.$dirty && user_login_form.admin.$error.required">
+				Por favor introduzca su usuario de administrador.
+			 </span>
+			 <br/>
+			 <br/>
+			 Contraseña: <input type="text" name="password" ng-model="password" ng-required="true"/>
+			 <span class="error-message" ng-show="user_login_form.password.$dirty && user_login_form.password.$error.required">
+			 	Por favor introduzca su contraseña.
+			 </span>
+		</form>
+	</p>
+</div>

@@ -21,7 +21,7 @@ config(function ($stateProvider, $urlRouterProvider) {
     // User
     state('user_login', {
       url: '/user_login',
-      templateUrl: 'partials/user_login.html',
+      templateUrl: '/partials/user_login.html',
       controller: 'Controller_UserLogin'
     }).
     state('user_profile', {
