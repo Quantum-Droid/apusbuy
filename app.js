@@ -3,15 +3,18 @@
  * Module dependencies
  */
 
-var express = require('express'),
-  bodyParser = require('body-parser'),
-  methodOverride = require('method-override'),  
-  morgan = require('morgan'),
-  routes = require('./routes/index'),
-  api = require('./routes/api'),
-  http = require('http'),
-  path = require('path'),
-  mongoose = require('mongoose');
+var express         = require('express'),
+    path            = require('path'),
+    morgan          = require('morgan'),
+    cookieParser    = require('cookie-parser'),
+    cookieSession   = require('cookie-session'),
+    bodyParser      = require('body-parser'),
+    methodOverride  = require('method-override'),  
+    routes          = require('./routes/index'),
+    api             = require('./routes/api'),
+    http            = require('http'),
+    mongoose        = require('mongoose');
+
 
 var app = module.exports = express();
 
@@ -20,6 +23,9 @@ var app = module.exports = express();
  * Configuration
  */
 
+//soporte para manejo de sesiones
+app.use(cookieSession({secret: 'Una cadena secreta'}));
+
 // all environments
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
@@ -27,6 +33,7 @@ app.set('view engine', 'ejs');
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use(methodOverride());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'views')));

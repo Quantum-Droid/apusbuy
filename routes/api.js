@@ -17,8 +17,9 @@ var Inventory = require('../models/inventory');
 const CLIENT_NOT_FOUND_ERROR = "Could not find client in the DB.";
 const PRODUCT_NOT_FOUND_ERROR = "Could not find product in the DB."
 const INVENTORY_NOT_FOUND_ERROR = "Could not fund inventory in the DB."
-const ADMIN_NOT_FOUND_ERROR = "Could not fund admin in the DB."
+const ADMIN_NOT_FOUND_ERROR = "Could not find admin in the DB."
 const INVALID_PARAMS_ERROR = "Invalid parameters."
+const SESSION_EXPIRED_ERROR = "No session found"
 const FIRST_DISCOUNT = 10; //10% discount
 const FIRST_DISCOUNT_REQUIREMENT = 5; //5 bought items needed for first discount
 const SECOND_DISCOUNT = 20;//20% discount
@@ -125,12 +126,33 @@ router.post('/clientLogin', (req, res) => {
 		{email: req.body.email, 
 		password: req.body.password}, 
 	(err, client) => {
-		if(!err){
-			console.log(client + ' found.');
+		if(!err && client){
+			console.log('found.');
+			req.session.id = client._id;
 			res.json(client);
-		}
+		}else res.json(responseError(CLIENT_NOT_FOUND_ERROR))
 	});	
 });
+
+/*** SESSION TEST ***/
+router.get('/test', (req, res) =>{
+	var id = req.session.id
+	if(id){
+		Client.findOne({_id: new ObjectId(id)},	(err, client) => {
+			if(!err) console.log(client + ' found.');
+			res.json(client);
+		});
+	}else res.json(SESSION_EXPIRED_ERROR);	
+	
+})
+
+/*
+* Logs the user out by destroying the cookie
+*/
+router.get('/logout', (req,res) =>{
+	req.session = null;
+	res.json(req.session)
+})
 
 //admin login send email and password in the body
 router.post('/adminLogin', (req, res) => {
