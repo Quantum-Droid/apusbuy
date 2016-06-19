@@ -7,6 +7,9 @@
 	</p>
 	<p>
 		Aquí podrás ver a los empleados registrados como Vendedores, y remover o agregar empleados a la lista.
+		<br/>
+		<button ng-click="logout()">Cerrar sesión</button>
+		<br/>
 	</p>
 	<p>
 		<h4>Lista de administradores</h4>
@@ -54,9 +57,9 @@
 	</p>
 	<p>
 		<h4>Modificar vendedor</h4>
-		<form name="addSalesmanForm" novalidate>
-			Email (cuenta del vendedor): <input type="text" name="new_email" ng-model="new_email" ng-required="true" />
-			<span class="error-message" ng-show="addSalesmanForm.new_email.$dirty && addSalesmanForm.new_email.$error.required">
+		<form name="modifySalesmanForm" novalidate>
+			Email (cuenta del vendedor): <input type="text" name="salesmanEmailToModify" ng-model="salesmanEmailToModify" ng-required="true" />
+			<span class="error-message" ng-show="modifySalesmanForm.salesmanEmailToModify.$dirty && modifySalesmanForm.salesmanEmailToModify.$error.required">
 				El email es necesario para saber a qué cuenta se le harán modificaciones.
 			</span> <br/>
 			Nombre: <input type="text" name="existing_name" ng-model="existing_name" /> <br/>
@@ -104,8 +107,8 @@
 	<p>
 		<h4>Modificar admin de R.H.</h4>
 		<form name="addHRForm" novalidate>
-			Email (cuenta del admin de R.H.): <input type="text" name="new_email" ng-model="new_email" ng-required="true" />
-			<span class="error-message" ng-show="addHRForm.new_email.$dirty && addHRForm.new_email.$error.required">
+			Email (cuenta del admin de R.H.): <input type="text" name="hrEmailToModify" ng-model="hrEmailToModify" ng-required="true" />
+			<span class="error-message" ng-show="addHRForm.hrEmailToModify.$dirty && addHRForm.hrEmailToModify.$error.required">
 				El email es necesario para saber a qué cuenta se le harán modificaciones.
 			</span> <br/>
 			Nombre: <input type="text" name="existing_name" ng-model="existing_name" /> <br/>
