@@ -18,21 +18,21 @@ config(function ($stateProvider, $urlRouterProvider) {
       templateUrl: 'partials/main_menu.html',
       controller: 'Controller_MainMenu'
     }).
-    // User
-    state('user_login', {
-      url: '/user_login',
-      templateUrl: '/partials/user_login.html',
-      controller: 'Controller_UserLogin'
+    // Client
+    state('client_login', {
+      url: '/client_login',
+      templateUrl: '/partials/client_login.html',
+      controller: 'Controller_ClientLogin'
     }).
-    state('user_profile', {
-      url: '/user_profile/:user_id',
-      templateUrl: 'partials/user_profile.html',
-      controller: 'Controller_UserProfile'
+    state('client_profile', {
+      url: '/client_profile/:client_id',
+      templateUrl: 'partials/client_profile.html',
+      controller: 'Controller_ClientProfile'
     }).
-    state('user_shopping_cart', {
-      url: '/user_shopping_cart/:user_id',
-      templateUrl: 'partials/user_shopping_cart.html',
-      controller: 'Controller_UserShoppingCart'
+    state('client_shopping_cart', {
+      url: '/client_shopping_cart/:client_id',
+      templateUrl: 'partials/client_shopping_cart.html',
+      controller: 'Controller_ClientShoppingCart'
     }).
     // Admin
     state('admin_login', {
