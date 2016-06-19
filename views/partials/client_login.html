@@ -17,10 +17,11 @@
 			 </span>
 			 <br/>
 			 <br/>
-			 Contraseña: <input type="text" name="password" ng-model="password" ng-required="true"/>
+			 Contraseña: <input type="password" name="password" ng-model="password" ng-required="true"/>
 			 <span class="error-message" ng-show="client_login_form.password.$dirty && client_login_form.password.$error.required">
 			 	Por favor introduzca su contraseña.
 			 </span>
 		</form>
+		<button ng-click="login()">Iniciar sesión</button>
 	</p>
 </div>
