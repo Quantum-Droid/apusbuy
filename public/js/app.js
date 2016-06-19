@@ -25,44 +25,44 @@ config(function ($stateProvider, $urlRouterProvider) {
       controller: 'Controller_UserLogin'
     }).
     state('user_profile', {
-      url: '/user_profile',
+      url: '/user_profile/:user_id',
       templateUrl: 'partials/user_profile.html',
       controller: 'Controller_UserProfile'
     }).
     state('user_shopping_cart', {
-      url: '/user_shopping_cart',
+      url: '/user_shopping_cart/:user_id',
       templateUrl: 'partials/user_shopping_cart.html',
       controller: 'Controller_UserShoppingCart'
     }).
     // Admin
     state('admin_login', {
-      url: '/admin_login',
+      url: '/admin_login/:admin_id',
       templateUrl: 'partials/admin_login.html',
       controller: 'Controller_AdminLogin'
     }).
     state('admin_salesmen', {
-      url: '/admin_salesmen',
+      url: '/admin_salesmen/:admin_id',
       templateUrl: 'partials/admin_salesmen.html',
       controller: 'Controller_AdminSalesmen'
     }).
     state('admin_hr', {
-      url: '/admin_hr',
+      url: '/admin_hr/:admin_id',
       templateUrl: 'partials/admin_hr.html',
       controller: 'Controller_AdminHR'
     }).
     state('admin_superuser', {
-      url: '/admin_superuser',
+      url: '/admin_superuser/:admin_id',
       templateUrl: 'partials/admin_superuser.html',
       controller: 'Controller_AdminSuperuser'
     }).
     // Product
     state('product_analysis', {
-      url: '/product_analysis',
+      url: '/product_analysis/:product_id',
       templateUrl: 'partials/product_analysis.html',
       controller: 'Controller_ProductAnalysis'
     }).
     state('product_detail', {
-      url: '/product_detail',
+      url: '/product_detail/:product_id',
       templateUrl: 'partials/product_detail.html',
       controller: 'Controller_ProductDetail'
     })

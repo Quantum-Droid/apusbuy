@@ -1,4 +1,4 @@
-<div>
+<div class="container">
 	<!-- Template for the main page an HR admin would see. It displays the Salesmen admin accounts that are available, and has an option to add more. -->
 	<h3>
 		Administrador de Recursos Humanos
@@ -9,20 +9,8 @@
 	<p>
 		Empleados:
 		<ul>
-			<li>Juan</li>
+			<li>{{employee}}<button ng-click="fetchEmployee()">Ir al perfil</button></li>
+			<li>Should continue dynamically...</li>
 		</ul>
-		<form name="user_login_form" novalidate>
-			<!-- Maybe change input to EMAIL? -->
-			Usuario (Admin): <input type="text" name="admin" ng-model="admin" ng-required="true"/>
-			<span class="error-message" ng-show="user_login_form.admin.$dirty && user_login_form.admin.$error.required">
-				Por favor introduzca su usuario de administrador.
-			 </span>
-			 <br/>
-			 <br/>
-			 Contraseña: <input type="text" name="password" ng-model="password" ng-required="true"/>
-			 <span class="error-message" ng-show="user_login_form.password.$dirty && user_login_form.password.$error.required">
-			 	Por favor introduzca su contraseña.
-			 </span>
-		</form>
 	</p>
 </div>
