@@ -482,127 +482,128 @@ router.delete('/client', (req, res) => {
 
 
 /*************** CART SECTION ***********************/
-
 //get client cart
 router.get('/cart', (req,res) =>{
-	var id = req.query
-	Client.findOne({_id: id}, (err,client) =>{
-		if(!err){
-			if(client)
-				res.json(client.cart)
-			else
-				res.json({error: 'Client not found'})			
-		}else{
-			res.json({error: err})
-		}
-	})
+	var id = req.session.id
+	if(id){
+		id = new ObjectId(id);
+		Client.findOne({_id: id}, (err,client) =>{
+			if(!err && client){				
+				res.json(client.cart)				
+			}else	res.json(responseError(CLIENT_NOT_FOUND_ERROR))			
+		})
+	}else res.json(responseError(SESSION_EXPIRED_ERROR));
 });
 
 //Clears a client's cart
 router.delete('/cart', (req,res) =>{
-	var id = req.query._id;
-	Client.findOne({_id: id}, (err, client) =>{
-		if(!err){
-			if(client){
-				client.cart = {					
-						orders: []						
-				};
-				client.save((err, savedClient) =>{
-					if(!err && savedClient) res.json(savedClient);
-					else res.json(responseError("Could not delete client's cart"))
-				})
-			}else res.json(responseError('Could not found client.'));
+	var id = req.session.id;
+	if(id){
+		id = new ObjectId(id);
+		Client.findOne({_id: id}, (err, client) =>{
+		if(!err && client){			
+			client.cart = {					
+					orders: []						
+			};
+			client.save((err, savedClient) =>{
+				if(!err && savedClient) res.json(savedClient);
+				else res.json(responseError("Could not delete client's cart"))
+			})			
 		}else res.json(responseError(err));
 	})
+	}else res.json(responseError(SESSION_EXPIRED_ERROR));
 });
 
 //add or remove products to/from client's cart
 router.put('/cart', (req,res) =>{
-	if(validParams(req.body) && validParams(req.query)){
-		var id = ObjectId(req.query._id);
-		var productId = ObjectId(req.body.product);
-		var ammount = req.body.ammount;
-		var action = req.body.action;	
-		Client.findOne(id,(err, client) =>{ //get client from DB			
-			if(!err && client){ //client found
-				if(action === "add"){ //add product to client's cart
-					Product.findOne(productId, (err, product) =>{ //get product from DB
-						if(!err && product){ //product found
-							client.cart.orders.push({"product": product, "ammount": ammount});
-							client.save((err, savedClient) =>{ //update client in DB.
-								if(!err){
-									res.json(savedClient);
-								}else res.json(err);
-							})
-						}else res.json(responseError(PRODUCT_NOT_FOUND_ERROR));
-					})
-				}
-				if(action === "remove"){
-					client.cart.orders.forEach((order, index) =>{
-						if(order.product == productId.toString()){
-							client.cart.orders.splice(index, 1);							
-						}						
-					})
-					client.save((err, savedClient) =>{
-							if(!err) res.json(savedClient);
-							else res.json(responseError(err));
+	var id = req.session.id;
+	if(id){
+		if(validParams(req.body)){
+			id = ObjectId(id);
+			var productId = ObjectId(req.body.product);
+			var ammount = req.body.ammount;
+			var action = req.body.action;	
+			Client.findOne(id,(err, client) =>{ //get client from DB			
+				if(!err && client){ //client found
+					if(action === "add"){ //add product to client's cart
+						Product.findOne(productId, (err, product) =>{ //get product from DB
+							if(!err && product){ //product found
+								client.cart.orders.push({"product": product, "ammount": ammount});
+								client.save((err, savedClient) =>{ //update client in DB.
+									if(!err){
+										res.json(savedClient);
+									}else res.json(err);
+								})
+							}else res.json(responseError(PRODUCT_NOT_FOUND_ERROR));
 						})
-				}
-			}else res.json(responseError(CLIENT_NOT_FOUND_ERROR));			
-		})
-	}else res.json(responseError(INVALID_PARAMS_ERROR))	
+					}
+					if(action === "remove"){
+						client.cart.orders.forEach((order, index) =>{
+							if(order.product == productId.toString()){
+								client.cart.orders.splice(index, 1);							
+							}						
+						})
+						client.save((err, savedClient) =>{
+								if(!err) res.json(savedClient);
+								else res.json(responseError(err));
+							})
+					}
+				}else res.json(responseError(CLIENT_NOT_FOUND_ERROR));			
+			})
+		}else res.json(responseError(INVALID_PARAMS_ERROR))	
+	}else res.json(responseError(SESSION_EXPIRED_ERROR));
 });
 
 /*Represents a sale. Clears client's cart and
 updates bought items from Inventory*/
 router.post('/checkout', (req,res) =>{
-	if (validParams(req.query)){
-		var id = ObjectId(req.query._id);
+	var id = req.session.id;
+	if(id){		
+		id = ObjectId(id);
+		console.log(id)
 		Client.findOne({_id: id}, (err, client) =>{
-			if(!err){ //no error
-				if(client){	//client found										
-					Inventory.findOne((err,inventory) =>{ //get inventory
-						if(!err && inventory){
-							//Search products in inventory
-							for (var i = inventory.items.length - 1; i >= 0; i--) {
-								for (var j = client.cart.orders.length - 1; j >= 0; j--) {									
-									if(inventory.items[i].product.toString() === 
-										client.cart.orders[j].product.toString()){
-										//found product in inventory -> update ammounts available										
-										inventory.items[i].ammount -= client.cart.orders[j].ammount;																												
-									}
-								}	
-							}
-							//save inventory TO db
-							inventory.save((err, savedInventory) =>{
-								//set disccount if needed
-								switch (client.boughtItems) {
-									case FIRST_DISCOUNT_REQUIREMENT:
-										client.cart.discount = FIRST_DISCOUNT;
-										break;
-									case SECOND_DISCOUNT_REQUIREMENT:
-										client.cart.discount = SECOND_DISCOUNT;
-										break;
-									case THIRD_DISCOUNT_REQUIREMENT:
-										client.cart.discount = THIRD_DISCOUNT;
-										THIRD_DISCOUNT_REQUIREMENT += THIRD_DISCOUNT_REQUIREMENT;
-										break;
-									default:																				
-										client.cart.discount = 0;
-										break;				
+			if(!err && client){ //no error												
+				Inventory.findOne((err,inventory) =>{ //get inventory
+					if(!err && inventory){
+						//Search products in inventory
+						for (var i = inventory.items.length - 1; i >= 0; i--) {
+							for (var j = client.cart.orders.length - 1; j >= 0; j--) {									
+								if(inventory.items[i].product.toString() === 
+									client.cart.orders[j].product.toString()){
+									//found product in inventory -> update ammounts available										
+									inventory.items[i].ammount -= client.cart.orders[j].ammount;																												
 								}
-								//increase client's bought items field
-								client.boughtItems += client.cart.orders.length
-								//clear client's cart
-								client.cart.orders = [];								
-								client.save((err,savedClient) =>{
-									if(!err) res.json(savedClient);
-								})
+							}	
+						}
+						//save inventory To db
+						inventory.save((err, savedInventory) =>{
+							//set disccount if needed
+							switch (client.boughtItems) {
+								case FIRST_DISCOUNT_REQUIREMENT:
+									client.cart.discount = FIRST_DISCOUNT;
+									break;
+								case SECOND_DISCOUNT_REQUIREMENT:
+									client.cart.discount = SECOND_DISCOUNT;
+									break;
+								case THIRD_DISCOUNT_REQUIREMENT:
+									client.cart.discount = THIRD_DISCOUNT;
+									THIRD_DISCOUNT_REQUIREMENT += THIRD_DISCOUNT_REQUIREMENT;
+									break;
+								default:																				
+									client.cart.discount = 0;
+									break;				
+							}
+							//increase client's bought items field
+							client.boughtItems += client.cart.orders.length
+							//clear client's cart
+							client.cart.orders = [];								
+							client.save((err,savedClient) =>{
+								if(!err) res.json(savedClient);
 							})
-						}else res.json(responseError(INVENTORY_NOT_FOUND_ERROR))
-					})								
-				}else res.json(responseError(CLIENT_NOT_FOUND_ERROR));
-			}else res.json(responseError(err));
-		});
-	}else res.json(responseError('Invalid params'));
+						})
+					}else res.json(responseError(INVENTORY_NOT_FOUND_ERROR))
+				})								
+			}else res.json(responseError(CLIENT_NOT_FOUND_ERROR));				
+		});		
+	}else res.json(SESSION_EXPIRED_ERROR);
 });
