@@ -144,13 +144,20 @@ router.post('/adminLogin', (req, res) => {
 });
 /*************** ADMIN SECTION ***********************/
 
-//get admin information send admin _id as a parameter
+//get admin information based on the specified parameter
 router.get('/admin', (req, res) => {
-	Admin.findOne({_id: new ObjectId(req.query._id)},
-	(err, admin) => {
-		if(!err) console.log(admin + ' found.');
-		res.json(admin);
-	});
+	var fields = Object.keys(req.query);
+	if(validParams(req.query) && fields.length){
+				var searchBy = fields[0];
+				var field = req.query[fields];
+				var search = {};
+				search[searchBy] = new RegExp('^' + field + '$', "i");
+				Admin.findOne(search, (err, admin) =>{
+					if(!err && admin){
+						res.json(admin)
+					}else res.json(responseError(ADMIN_NOT_FOUND_ERROR))
+				})
+	}else res.json(responseError(INVALID_PARAMS_ERROR));
 });
 
 //create accounts for the different managment roles
@@ -172,12 +179,29 @@ router.post('/admin', (req, res) => {
   }); 
 });
 
-//get all admins
+/*
+* Get all admins by search field
+* If no field is specified, all admins are retrived
+*/
 router.get('/admins', (req, res) => {
-	Admin.find({}, (err, admins) => {
-		if(!err) console.log(admins + ' found.');
-		res.json(admins);
-	});
+	var fields = Object.keys(req.query);
+	if(validParams(req.query) && fields.length){
+		var searchBy = fields[0];
+		var field = req.query[fields];
+		var search = {};
+		search[searchBy] = new RegExp('^' + field + '$', "i");
+		Admin.find(search, (err, admin) =>{
+			if(!err && admin){
+				res.json(admin)
+			}else res.json(responseError(ADMIN_NOT_FOUND_ERROR))
+		})
+	}else{
+		//Return all admins in DB
+		Admin.find({}, (err, admins) => {
+			if(!err) console.log(admins + ' found.');
+			res.json(admins);
+		});
+	}
 });
 
 //modifiy admin information send admin updated information in the body
