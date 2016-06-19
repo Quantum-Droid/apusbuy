@@ -171,7 +171,7 @@ angular.module('myApp.controllers', []).
       // Logout function.
       $http.get(route + '/logout')
       .then(function successCallback(response) {
-        state.go('main_menu');
+        $state.go('main_menu');
       })
     }
 
