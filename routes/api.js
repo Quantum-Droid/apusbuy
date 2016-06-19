@@ -20,6 +20,7 @@ const INVENTORY_NOT_FOUND_ERROR = "Could not fund inventory in the DB."
 const ADMIN_NOT_FOUND_ERROR = "Could not find admin in the DB."
 const INVALID_PARAMS_ERROR = "Invalid parameters."
 const SESSION_EXPIRED_ERROR = "No session found"
+const PERMISSION_ERROR = "You don't have permission to do this";
 const FIRST_DISCOUNT = 10; //10% discount
 const FIRST_DISCOUNT_REQUIREMENT = 5; //5 bought items needed for first discount
 const SECOND_DISCOUNT = 20;//20% discount
@@ -27,6 +28,9 @@ const SECOND_DISCOUNT_REQUIREMENT = 10;//10 bought items needed for first discou
 const THIRD_DISCOUNT = 30; //30% discount
 var THIRD_DISCOUNT_REQUIREMENT = 20; //20 bought items needed for first discount
 
+const SU_ROLE = "Super User";
+const VENTAS_ROLE = "Ventas";
+const RH_ROLE = "Recursos Humanos"
 
 module.exports = router;
 
@@ -69,6 +73,37 @@ function validParams (params) {
 //Creates an error JSON object with msg description
 function responseError(msg) {
 	return {'error': msg};
+}
+
+/*
+* Returns the value associated with each role
+* SU = 2
+* RH = 1
+* Ventas = 0
+*/
+function getRolePriority (role) {
+	 switch (role) {
+	 	case SU_ROLE:
+	 		return 2;	
+ 		case RH_ROLE:
+ 			return 1;
+ 		case VENTAS_ROLE:
+ 			return 0 		
+	 	default:
+	 		return -1;	 		
+	 }
+}
+
+/*
+* Return if an admin modification is posible
+*/
+function canModify(modifier, modified) {
+		if(modifier && modified){
+			modifier = getRolePriority(modifier);
+			modified = getRolePriority(modified);
+			return modifier > modified;
+		}
+		return false;
 }
 
 /*************** LOGIN / REGISTER SECTION **************/
@@ -130,7 +165,7 @@ router.post('/clientLogin', (req, res) => {
 			console.log('found.');
 			req.session.id = client._id;
 			res.json(client);
-		}else res.json(responseError(CLIENT_NOT_FOUND_ERROR))
+		}else res.json(client)
 	});	
 });
 
@@ -142,8 +177,7 @@ router.get('/test', (req, res) =>{
 			if(!err) console.log(client + ' found.');
 			res.json(client);
 		});
-	}else res.json(SESSION_EXPIRED_ERROR);	
-	
+	}else res.json(SESSION_EXPIRED_ERROR);		
 })
 
 /*
@@ -160,7 +194,11 @@ router.post('/adminLogin', (req, res) => {
 		{email: req.body.email, 
 		password: req.body.password}, 
 	(err, admin) => {
-		if(!err)console.log(admin + 'found.');
+		if(!err && admin){
+			console.log('Admin found');
+			req.session.id = admin._id;
+			req.session.role = admin.role
+		}		
 		res.json(admin);
 	});	
 });
@@ -250,12 +288,22 @@ router.put('/admin', (req, res) => {
 
 //delete admin by id in body
 router.delete('/admin', (req, res) => {
-	Admin.remove({_id: new ObjectId(req.query._id)},
-	(err, obj) => {
-		if(!err){			
-			res.json(obj);
-		}
-	});
+	var role = req.session.role;
+	var id = req.session.id;
+	var toRemove = new ObjectId(req.query._id);
+	if(id && role){
+		Admin.findOne({_id: toRemove}, (err, admin) =>{
+			if(!err && admin){
+				var removedRole = admin.role;
+				if(canModify(role,removedRole)){
+					admin.remove((err, removed) =>{
+						if(!err)
+							res.json(removed);
+					})
+				}else res.json(responseError(PERMISSION_ERROR))
+			}else res.json(responseError(ADMIN_NOT_FOUND_ERROR));
+		})
+	}else res.json(responseError(SESSION_EXPIRED_ERROR));
 });
 
 /*************** PRODUCT SECTION ***********************/
