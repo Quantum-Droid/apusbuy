@@ -122,7 +122,7 @@ angular.module('myApp.controllers', []).
         if ($scope.existing_password !== undefined && $scope.existing_password.trim() !== '') {
           password = $scope.existing_password;
         }
-        $http.put(route + '/admin?admin_id=' + id, {
+        $http.put(route + '/admin?_id=' + id, {
           // Using id to actually modify the backend registry.
           "name":name,
           "lastName":lastName,
@@ -148,7 +148,7 @@ angular.module('myApp.controllers', []).
         var id = response.data._id;
         // If user actually exists.
         if (!response.data.error) {
-          $http.delete(route + '/admin?admin_id=' + id)
+          $http.delete(route + '/admin?_id=' + id)
           // Using id to actually delete the backend registry.
           .then(function successCallback(response2) {
             $scope.deleteSalesmanStatus = "El vendedor fue dado de baja exitosamente.";
@@ -167,8 +167,25 @@ angular.module('myApp.controllers', []).
   controller('Controller_AdminSuperuser', function ($scope, $http, $stateParams, $state) {
     // Web page so a super user can do everything including HR and Salesman rights, in addition to own super user rights.
 
+    // Getting the list of admins.
+    $scope.showAdmins = function() {
+      $http.get(route + '/admins')
+      .then(function successCallback(response) {
+        $scope.admins = response.data;
+      }, function successCallback (response) {
+        console.log('Couldn\'t load admins.');
+      });
+    }
+
+    $scope.showAdmins();
+
+    // Sorting list of admins.
+    $scope.filterOptions = function(param) {
+      $scope.filterOption = param;
+    }
+
+    // Logout function
     $scope.logout = function() {
-      // Logout function.
       $http.get(route + '/logout')
       .then(function successCallback(response) {
         $state.go('main_menu');
@@ -179,39 +196,29 @@ angular.module('myApp.controllers', []).
               START OF SUPER USER RIGHTS
        ******************************************** */
 
-    $scope.addHRStatus = '';
-    $scope.modifyHRStatus = '';
-    $scope.deleteHRStatus = '';
+    $scope.addAdminStatus = '';
+    $scope.modifyAdminStatus = '';
+    $scope.deleteAdminStatus = '';
     
-    $scope.getSalesmen = function() {
-      // GET method that obtains HR admins.
-      $http.get(route + '/admins')
-      .then(function successCallback(response) {
-        $scope.hr = response.data;
-      }, function errorCallback(response) {
-        console.log('Error getting salesmen.');
-      })
-    }
-
-    $scope.addHR = function() {
+    $scope.addAdmin = function() {
       // POST method that adds a new salesman.
       $http.post(route + '/admin', {
         "name":$scope.new_name,
         "lastName":$scope.new_lastName,
         "email":$scope.new_email,
         "password":$scope.new_password,
-        "role":"Recursos Humanos"
+        "role":$scope.new_role,
       })
       .then(function successCallback(response) {
-        $scope.addHRStatus = "El admin de R.H. se agregó exitosamente.";
+        $scope.addAdminStatus = "El admin de R.H. se agregó exitosamente.";
       }, function errorCallback(response) {
-        $scope.addHRStatus = "Error: el admin de R.H. no se pudo agregar.";
+        $scope.addAdminStatus = "Error: el admin de R.H. no se pudo agregar.";
       });
     }
 
-    $scope.modifyHR = function() {
+    $scope.modifyAdmin = function() {
       // PUT method to modify an existing Salesman. We start with getting his id.
-      $http.get(route + '/admin?email=' + $scope.hrEmailToModify)
+      $http.get(route + '/admin?email=' + $scope.adminEmailToModify)
       .then(function successCallback(response) {
         // Getting previous info in case admin does not change a field.
         var id = response.data._id;
@@ -234,36 +241,36 @@ angular.module('myApp.controllers', []).
           "name":name,
           "lastName":lastName,
           // #NOTE -> according to specifications, cannot modify email on any user.
-          "email":$scope.hrEmailToModify, 
+          "email":$scope.adminEmailToModify, 
           "password":password,
           "role":role
         })
         .then(function successCallback(response2) {
-          $scope.modifyHRStatus = "El admin de R.H. se modificó exitosamente.";
+          $scope.modifyAdminStatus = "El admin se modificó exitosamente.";
         }, function errorCallback(response2) {
-          $scope.modifyHRStatus = "Error: el admin de R.H. no se pudo modificar."; 
+          $scope.modifyAdminStatus = "Error: el admin no se pudo modificar."; 
         });
       }, function errorCallback(response) {
         console.log('Error trying to retrieve admin.');
       });
     }
 
-    $scope.deleteHR = function() {
+    $scope.deleteAdmin = function() {
       // DELETE method to delete an existing HR admin. We start with getting the id.
-      $http.get(route + '/admin?email=' + $scope.hrEmailToDelete)
+      $http.get(route + '/admin?email=' + $scope.adminEmailToDelete)
       .then(function successCallback(response) {
         var id = response.data._id;
         // If user actually exists.
-        if (!response.data.error) {
+        if (response.data.error === undefined) {
           $http.delete(route + '/admin?_id=' + id)
           // Using id to actually delete the backend registry.
           .then(function successCallback(response2) {
-            $scope.deleteHRStatus = "El admin de R.H. fue dado de baja exitosamente.";
+            $scope.deleteAdminStatus = "El admin fue dado de baja exitosamente.";
           }, function errorCallback(response2) {
-            $scope.deleteHRStatus = "Error: el admin de R.H. no pudo ser dado de baja.";
+            $scope.deleteAdminStatus = "Error: el admin no pudo ser dado de baja.";
           });
         } else {
-          $scope.deleteHRStatus = "Error: el admin de R.H. no existe.";
+          $scope.deleteAdminStatus = "Error: el admin no existe.";
         }
       }, function errorCallback(response) {
         console.log('Error while trying to delete admin.');
@@ -272,107 +279,6 @@ angular.module('myApp.controllers', []).
     /* ********************************************
                 END OF SUPER USER RIGHTS
        ******************************************** */
-
-    /* ********************************************
-                START OF HR ADMIN RIGHTS
-       ******************************************** */
-
-    $scope.addSalesmanStatus = '';
-    $scope.modifySalesmanStatus = '';
-    $scope.deleteSalesmanStatus = '';
-    
-    $scope.getSalesmen = function() {
-      // GET method that obtains salesmen.
-      /* Should be replaced with improved API call */
-      $http.get(route + '/admins')
-      .then(function successCallback(response) {
-        $scope.salesmen = response.data;
-      }, function errorCallback(response) {
-        console.log('Error getting salesmen.');
-      })
-    }
-
-    $scope.addSalesman = function() {
-      // POST method that adds a new salesman.
-      $http.post(route + '/admin', {
-        "name":$scope.new_name,
-        "lastName":$scope.new_lastName,
-        "email":$scope.new_email,
-        "password":$scope.new_password,
-        "role":"Ventas"
-      })
-      .then(function successCallback(response) {
-        $scope.addSalesmanStatus = "El vendedor se agregó exitosamente.";
-      }, function errorCallback(response) {
-        $scope.addSalesmanStatus = "Error: el vendedor no se pudo agregar.";
-      });
-    }
-
-    $scope.modifySalesman = function() {
-      // PUT method to modify an existing Salesman. We start with getting his id.
-      $http.get(route + '/admin?email=' + $scope.salesmanEmailToModify)
-      .then(function successCallback(response) {
-        // Getting previous info in case admin does not change a field.
-        var id = response.data._id;
-        var name = response.data.name;
-        var lastName = response.data.lastName;
-        var password = response.data.password;
-        var role = response.data.role;
-        // Checking if user input is neither undefined nor blank.
-        if ($scope.existing_name !== undefined && $scope.existing_name.trim() !== '') {
-          name = $scope.existing_name;
-        }
-        if ($scope.existing_lastName !== undefined && $scope.existing_lastName.trim() !== '') {
-          lastName = $scope.existing_lastName;
-        }
-        if ($scope.existing_password !== undefined && $scope.existing_password.trim() !== '') {
-          password = $scope.existing_password;
-        }
-        $http.put(route + '/admin?_id=' + id, {
-          // Using id to actually modify the backend registry.
-          "name":name,
-          "lastName":lastName,
-          // #NOTE -> according to specifications, cannot modify email on any user.
-          "email":$scope.salesmanEmailToModify, 
-          "password":password,
-          "role":role
-        })
-        .then(function successCallback(response2) {
-          $scope.modifySalesmanStatus = "El vendedor se modificó exitosamente.";
-        }, function errorCallback(response2) {
-          $scope.modifySalesmanStatus = "Error: el vendedor no se pudo modificar."; 
-        });
-      }, function errorCallback(response) {
-        console.log('Error trying to retrieve admin.');
-      });
-    }
-
-    $scope.deleteSalesman = function() {
-      // DELETE method to delete an existing Salesman. We start with getting the id.
-      $http.get(route + '/admin?email=' + $scope.salesmanEmailToDelete)
-      .then(function successCallback(response) {
-        var id = response.data._id;
-        // If user actually exists.
-        if (!response.data.error) {
-          $http.delete(route + '/admin?_id=' + id)
-          // Using id to actually delete the backend registry.
-          .then(function successCallback(response2) {
-            $scope.deleteSalesmanStatus = "El vendedor fue dado de baja exitosamente.";
-          }, function errorCallback(response2) {
-            $scope.deleteSalesmanStatus = "Error: el vendedor no pudo ser dado de baja.";
-          });
-        } else {
-          $scope.deleteSalesmanStatus = "Error: el vendedor no existe.";
-        }
-      }, function errorCallback(response) {
-        console.log('Error while trying to delete salesman.');
-      });       
-    }
-
-    /* ********************************************
-                  END OF HR ADMIN RIGHTS
-       ******************************************** */
-
   }).
   controller('Controller_ProductDetail', function ($scope) {
     // write Ctrl here

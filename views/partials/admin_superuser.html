@@ -12,11 +12,22 @@
 		<br/>
 	</p>
 	<p>
-		<h4>Lista de administradores</h4>
-		<ul>
-			<li>admin 1</li>
-			<li>admin 2</li>
-		</ul>
+		<h4>Información de los administradores</h4>
+		<button ng-click="showAdmins()">Refrescar</button>
+		<table>
+			<tr>
+				<th><a ng-click="filterOptions(name)">Nombre</a></th>
+				<th><a ng-click="filterOptions(lastName)">Apellidos</a></th>
+				<th><a ng-click="filterOptions(email)">Email</a></th>
+				<th><a ng-click="filterOptions(role)">Rol</a></th>
+			</tr>
+			<tr ng-repeat="admin in admins | orderBy: filterOption">
+				<td>{{admin.name}}</td>
+				<td>{{admin.lastName}}</td>
+				<td>{{admin.email}}</td>
+				<td>{{admin.role}}</td>
+			</tr>
+		</table>
 	</p>
 	<p>
 		Acciones posibles:
@@ -29,102 +40,55 @@
 			<li>Dar de baja admin de R.H.</li>
 		</ul>
 	</p>
-	<!-- HR Admin rights for superuser -->
-	<p>
-		<h3>Derechos de R.H.</h3>
-	</p>
-	<p>
-		<h4>Agregar vendedor</h4>
-		<form name="addSalesmanForm" novalidate>
-			Nombre: <input type="text" name="new_name" ng-model="new_name" ng-required="true" />
-			<span class="error-message" ng-show="addSalesmanForm.new_name.$dirty && addSalesmanForm.new_name.$error.required">
-				El nombre es necesario.
-			</span> <br/>
-			Apellidos: <input type="text" name="new_lastName" ng-model="new_lastName" ng-required="true" />
-			<span class="error-message" ng-show="addSalesmanForm.new_lastName.$dirty && addSalesmanForm.new_lastName.$error.required">
-				Los apellidos son necesarios.
-			</span> <br/>
-			Email: <input type="text" name="new_email" ng-model="new_email" ng-required="true" />
-			<span class="error-message" ng-show="addSalesmanForm.new_email.$dirty && addSalesmanForm.new_email.$error.required">
-				El email es necesario.
-			</span> <br/>
-			Contraseña: <input type="password" name="new_password" ng-model="new_password" ng-required="true" />
-			<span class="error-message" ng-show="addSalesmanForm.new_password.$dirty && addSalesmanForm.new_password.$error.required">
-				La contraseña es necesaria.
-			</span>
-		</form>
-		<button ng-click="addSalesman()">Agregar</button> {{addSalesmanStatus}}
-	</p>
-	<p>
-		<h4>Modificar vendedor</h4>
-		<form name="modifySalesmanForm" novalidate>
-			Email (cuenta del vendedor): <input type="text" name="salesmanEmailToModify" ng-model="salesmanEmailToModify" ng-required="true" />
-			<span class="error-message" ng-show="modifySalesmanForm.salesmanEmailToModify.$dirty && modifySalesmanForm.salesmanEmailToModify.$error.required">
-				El email es necesario para saber a qué cuenta se le harán modificaciones.
-			</span> <br/>
-			Nombre: <input type="text" name="existing_name" ng-model="existing_name" /> <br/>
-			Apellidos: <input type="text" name="existing_lastName" ng-model="existing_lastName" /> <br/>
-			Contraseña: <input type="password" name="existing_password" ng-model="existing_password" /> <br/>
-		</form>
-		<button ng-click="modifySalesman()">Modificar</button> {{modifySalesmanStatus}}
-	</p>
-	<p>
-		<h4>Dar de baja vendedor</h4>
-		<form name="deleteSalesmanForm" novalidate>
-			Email del vendedor: <input type="text" name="salesmanEmailToDelete" ng-model="salesmanEmailToDelete" ng-required="true"/>
-			<span class="error-message" ng-show="deleteSalesmanForm.salesmanEmailToDelete.$dirty && deleteSalesmanForm.salesmanEmailToDelete.$error.required">
-				Por favor introduzca el email del vendedor que desea dar de baja.
-			</span>
-		</form>
-		<button ng-click="deleteSalesman()">Dar de baja</button> {{deleteSalesmanStatus}}
-	</p>
 	<!-- Superuser rights for superuser -->
 	<p>
-		<h3>Derechos de superusuario</h3>
-	</p>
-	<p>
-		<h4>Agregar admin de R.H.</h4>
-		<form name="addHRForm" novalidate>
+		<h4>Agregar admin</h4>
+		<form name="addAdminForm" novalidate>
 			Nombre: <input type="text" name="new_name" ng-model="new_name" ng-required="true" />
-			<span class="error-message" ng-show="addHRForm.new_name.$dirty && addHRForm.new_name.$error.required">
+			<span class="error-message" ng-show="addAdminForm.new_name.$dirty && addAdminForm.new_name.$error.required">
 				El nombre es necesario.
 			</span> <br/>
 			Apellidos: <input type="text" name="new_lastName" ng-model="new_lastName" ng-required="true" />
-			<span class="error-message" ng-show="addHRForm.new_lastName.$dirty && addHRForm.new_lastName.$error.required">
+			<span class="error-message" ng-show="addAdminForm.new_lastName.$dirty && addAdminForm.new_lastName.$error.required">
 				Los apellidos son necesarios.
 			</span> <br/>
 			Email: <input type="text" name="new_email" ng-model="new_email" ng-required="true" />
-			<span class="error-message" ng-show="addHRForm.new_email.$dirty && addHRForm.new_email.$error.required">
+			<span class="error-message" ng-show="addAdminForm.new_email.$dirty && addAdminForm.new_email.$error.required">
 				El email es necesario.
 			</span> <br/>
+			Rol: <input type="text" name="new_role" ng-model="new_role" ng-required="true" />
+			<span class="error-message" ng-show="addAdminForm.new_role.$dirty && addAdminForm.new_role.$error.required">
+				El rol es necesario (Ventas, Recursos Humanos, Super Usuario).
+			</span> <br/>
 			Contraseña: <input type="password" name="new_password" ng-model="new_password" ng-required="true" />
-			<span class="error-message" ng-show="addHRForm.new_password.$dirty && addHRForm.new_password.$error.required">
+			<span class="error-message" ng-show="addAdminForm.new_password.$dirty && addAdminForm.new_password.$error.required">
 				La contraseña es necesaria.
 			</span>
 		</form>
-		<button ng-click="addHR()">Agregar</button> {{addHRStatus}}
+		<button ng-click="addAdmin()">Agregar</button> {{addAdminStatus}}
 	</p>
 	<p>
-		<h4>Modificar admin de R.H.</h4>
-		<form name="addHRForm" novalidate>
-			Email (cuenta del admin de R.H.): <input type="text" name="hrEmailToModify" ng-model="hrEmailToModify" ng-required="true" />
-			<span class="error-message" ng-show="addHRForm.hrEmailToModify.$dirty && addHRForm.hrEmailToModify.$error.required">
+		<h4>Modificar admin</h4>
+		<form name="modifyAdminForm" novalidate>
+			Email: <input type="text" name="adminEmailToModify" ng-model="adminEmailToModify" ng-required="true" />
+			<span class="error-message" ng-show="modifyAdminForm.adminEmailToModify.$dirty && modifyAdminForm.adminEmailToModify.$error.required">
 				El email es necesario para saber a qué cuenta se le harán modificaciones.
 			</span> <br/>
 			Nombre: <input type="text" name="existing_name" ng-model="existing_name" /> <br/>
 			Apellidos: <input type="text" name="existing_lastName" ng-model="existing_lastName" /> <br/>
+			Rol: <input type="text" name="existing_role" /> <br/>
 			Contraseña: <input type="password" name="existing_password" ng-model="existing_password" /> <br/>
 		</form>
-		<button ng-click="modifyHR()">Modificar</button> {{modifyHRStatus}}
+		<button ng-click="modifyAdmin()">Modificar</button> {{modifyAdminStatus}}
 	</p>
 	<p>
-		<h4>Dar de baja admin de R.H.</h4>
-		<form name="deleteHRForm" novalidate>
-			Email del admin de R.H.: <input type="text" name="hrEmailToDelete" ng-model="hrEmailToDelete" ng-required="true"/>
-			<span class="error-message" ng-show="deleteHRForm.hrEmailToDelete.$dirty && deleteHRForm.hrEmailToDelete.$error.required">
-				Por favor introduzca el email del admin de R.H. que desea dar de baja.
+		<h4>Dar de baja admin</h4>
+		<form name="deleteAdminForm" novalidate>
+			Email del admin: <input type="text" name="adminEmailToDelete" ng-model="adminEmailToDelete" ng-required="true"/>
+			<span class="error-message" ng-show="deleteAdminForm.adminEmailToDelete.$dirty && deleteAdminForm.adminEmailToDelete.$error.required">
+				Por favor introduzca el email del admin que desea dar de baja.
 			</span>
 		</form>
-		<button ng-click="deleteHR()">Dar de baja</button> {{deleteHRStatus}}
+		<button ng-click="deleteAdmin()">Dar de baja</button> {{deleteAdminStatus}}
 	</p>
 </div>
