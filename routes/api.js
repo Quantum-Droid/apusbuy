@@ -19,8 +19,9 @@ const PRODUCT_NOT_FOUND_ERROR = "Could not find product in the DB."
 const INVENTORY_NOT_FOUND_ERROR = "Could not fund inventory in the DB."
 const ADMIN_NOT_FOUND_ERROR = "Could not find admin in the DB."
 const INVALID_PARAMS_ERROR = "Invalid parameters."
-const SESSION_EXPIRED_ERROR = "No session found"
-const PERMISSION_ERROR = "You don't have permission to do this";
+const SESSION_NOT_FOUND_ERROR = "No session found"
+const UNSUPPORTED_ACTION_ERROR = "Unsupported action."
+const ELEMENT_NOT_SAVED_ERROR = "Element could not be saved in the DB."
 const FIRST_DISCOUNT = 10; //10% discount
 const FIRST_DISCOUNT_REQUIREMENT = 5; //5 bought items needed for first discount
 const SECOND_DISCOUNT = 20;//20% discount
@@ -111,15 +112,15 @@ function canModify(modifier, modified) {
 router.put('/verify',(req, res) => {
 	Client.findOne({_id: new ObjectId(req.query._id)},
 	(err, client) => {
-		if(!err && client){			
+		if(!err && client){	
 			client.verified = true;		
 			client.save((err, obj) => {
 				if (!err) {
 					console.log(obj.name + ' saved.');  		
-					res.json(obj);
+					return res.json(obj);
 				}  	
   		});
-		}else res.json(responseError(req.query._id));
+		}else return res.json(responseError(CLIENT_NOT_FOUND_ERROR));
 	});
 });
 
@@ -147,11 +148,11 @@ router.post('/register', (req, res) => {
   }
   
   client.save((err, obj) => {
-  	if (!err) {
+  	if (!err && obj) {
   		console.log(obj.name + ' saved.');
   		sendVerification(obj._id, obj.email);
-  		res.json(obj);
-  	}
+  		return res.json(obj);
+  	}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR))
   }); 
 });
 
@@ -164,28 +165,17 @@ router.post('/clientLogin', (req, res) => {
 		if(!err && client){
 			console.log('found.');
 			req.session.id = client._id;
-			res.json(client);
-		}else res.json(client)
+			return res.json(client);
+		}else return res.json(responseError(CLIENT_NOT_FOUND_ERROR))
 	});	
 });
-
-/*** SESSION TEST ***/
-router.get('/test', (req, res) =>{
-	var id = req.session.id
-	if(id){
-		Client.findOne({_id: new ObjectId(id)},	(err, client) => {
-			if(!err) console.log(client + ' found.');
-			res.json(client);
-		});
-	}else res.json(SESSION_EXPIRED_ERROR);		
-})
 
 /*
 * Logs the user out by destroying the cookie
 */
 router.get('/logout', (req,res) =>{
 	req.session = null;
-	res.json(req.session)
+	return res.json(true)
 })
 
 //admin login send email and password in the body
@@ -198,8 +188,8 @@ router.post('/adminLogin', (req, res) => {
 			console.log('Admin found');
 			req.session.id = admin._id;
 			req.session.role = admin.role
-		}		
-		res.json(admin);
+			return res.json(admin);
+		}else return res.json(responseError(ADMIN_NOT_FOUND_ERROR))				
 	});	
 });
 /*************** ADMIN SECTION ***********************/
@@ -213,17 +203,16 @@ router.get('/admin', (req, res) => {
 				var search = {};
 				search[searchBy] = new RegExp('^' + field + '$', "i");
 				Admin.findOne(search, (err, admin) =>{
-					if(!err && admin){
-						res.json(admin)
-					}else res.json(responseError(ADMIN_NOT_FOUND_ERROR))
+					if(!err){
+						return res.json(admin)
+					}else return res.json(responseError(ADMIN_NOT_FOUND_ERROR))
 				})
-	}else res.json(responseError(INVALID_PARAMS_ERROR));
+	}else return res.json(responseError(INVALID_PARAMS_ERROR));
 });
 
 //create accounts for the different managment roles
 //send name, lastname, email password and role in hte body
-router.post('/admin', (req, res) => {
-	
+router.post('/admin', (req, res) => {	
 	var admin = new Admin();
   admin.name = req.body.name;
   admin.lastName = req.body.lastName;
@@ -232,10 +221,10 @@ router.post('/admin', (req, res) => {
   admin.role = req.body.role
   
   admin.save((err, obj) => {
-  	if (!err) {
+  	if (!err && obj) {
   		console.log(obj.name + ' saved as admin.');  		
-  		res.json(obj);
-  	}  	
+  		return res.json(obj);
+  	}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR))
   }); 
 });
 
@@ -250,60 +239,65 @@ router.get('/admins', (req, res) => {
 		var field = req.query[fields];
 		var search = {};
 		search[searchBy] = new RegExp('^' + field + '$', "i");
-		Admin.find(search, (err, admin) =>{
-			if(!err && admin){
-				res.json(admin)
-			}else res.json(responseError(ADMIN_NOT_FOUND_ERROR))
+		Admin.find(search, (err, admins) =>{
+			if(!err)
+				return res.json(admins)
+			else return res.json(responseError(ADMIN_NOT_FOUND_ERROR))
 		})
 	}else{
 		//Return all admins in DB
 		Admin.find({}, (err, admins) => {
-			if(!err) console.log(admins + ' found.');
-			res.json(admins);
+			if(!err)
+				return res.json(admins);
+			else
+				return res.json(responseError(ADMIN_NOT_FOUND_ERROR))
 		});
 	}
 });
 
 //modifiy admin information send admin updated information in the body
 router.put('/admin', (req, res) => {	
-	Admin.findOne({_id: new ObjectId(req.query._id)},
-	(err, admin) => {
-		if(!err && admin){
-			console.log(admin + ' found.');
-			admin.name = req.body.name ? req.body.name : admin.name;
-			admin.lastName = req.body.lastName ? req.body.lastName : admin.lastName;
-			admin.email = req.body.email ? req.body.email : admin.email;
-			admin.password = req.body.password ? req.body.password : admin.password;
-			admin.role = req.body.role ? req.body.role : admin.role;
-
-			admin.save((err, obj) => {
-				if (!err) {
-					console.log(obj.name + ' saved.');
-					res.json(obj);
-				}  	
-			});
-		}else res.json(responseError(ADMIN_NOT_FOUND_ERROR));
-	});
+	if(validParams(req.query)){
+		Admin.findOne({_id: new ObjectId(req.query._id)},
+		(err, admin) => {
+			if(!err && admin){				
+				admin.name = req.body.name ? req.body.name : admin.name;
+				admin.lastName = req.body.lastName ? req.body.lastName : admin.lastName;
+				admin.email = req.body.email ? req.body.email : admin.email;
+				admin.password = req.body.password ? req.body.password : admin.password;
+				admin.role = req.body.role ? req.body.role : admin.role;
+				admin.save((err, obj) => {
+					if (!err && obj) {						
+						return res.json(obj);
+					}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR));
+				});
+			}else return res.json(responseError(ADMIN_NOT_FOUND_ERROR));
+		});
+	}return res.json(responseError(INVALID_PARAMS_ERROR));
 });
 
 //delete admin by id in body
 router.delete('/admin', (req, res) => {
 	var role = req.session.role;
 	var id = req.session.id;
-	var toRemove = new ObjectId(req.query._id);
+	var toRemove = req.query._id;
 	if(id && role){
-		Admin.findOne({_id: toRemove}, (err, admin) =>{
-			if(!err && admin){
-				var removedRole = admin.role;
-				if(canModify(role,removedRole)){
-					admin.remove((err, removed) =>{
-						if(!err)
-							res.json(removed);
-					})
-				}else res.json(responseError(PERMISSION_ERROR))
-			}else res.json(responseError(ADMIN_NOT_FOUND_ERROR));
-		})
-	}else res.json(responseError(SESSION_EXPIRED_ERROR));
+		if(toRemove){
+			toRemove = new ObjectId(toRemove);
+			Admin.findOne({_id: toRemove}, (err, admin) =>{
+				if(!err && admin){
+					var removedRole = admin.role;
+					if(canModify(role,removedRole)){
+						Admin.remove({_id: toRemove}, (err, status) =>{
+							if(status)
+								return res.json(status)
+							else return res.json(ELEMENT_NOT_SAVED_ERROR)
+						})
+					}else return res.json(responseError(UNSUPPORTED_ACTION_ERROR))
+				}else return res.json(responseError(ADMIN_NOT_FOUND_ERROR));
+			})
+		}else return res.json(responseError(INVALID_PARAMS_ERROR));
+	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));
 });
 
 /*************** PRODUCT SECTION ***********************/
@@ -326,12 +320,12 @@ router.post('/product', (req, res) => {
   				inventory.items.push({product: p, ammount: ammount})
   				inventory.save((err,savedInventory) =>{
   					if(!err)
-  						res.json(p);
-  					else res.json(responseError(err))
+  						return res.json(p);
+  					else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR))
   				})
-  			}else res.json(responseError(INVENTORY_NOT_FOUND_ERROR));
+  			}else return res.json(responseError(INVENTORY_NOT_FOUND_ERROR));
   		})
-  	}else res.json(responseError(err));
+  	}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR));
   }); 
 });
 
@@ -341,8 +335,9 @@ router.post('/product', (req, res) => {
 router.get('/product', (req, res) => {
 	Product.findOne({_id: new ObjectId(req.query._id)},
 	(err, product) => {
-		if(!err) console.log(product + ' found.');
-		res.json(product);
+		if(!err)
+			return res.json(product);
+		else return res.json(responseError(PRODUCT_NOT_FOUND_ERROR));
 	});
 });
 
@@ -351,97 +346,112 @@ router.get('/product', (req, res) => {
 * if no category is specified, returns all products in DB
 */
 router.get('/products', (req, res) => {	
-	if(validParams(req.query)){
-		var category = req.query.category;
-		if(category){
-			Product.find({categories: category}, (err, products) =>{
-				if(!err)
-					res.json(products)
-				else res.json(err);
-			})
-		}else{
-			Product.find({}, (err, products) => {
-			if(!err){
-				res.json(products);
-			}else res.json(responseError(err));
-		});
-		}		
-	}else res.json(responseError(INVALID_PARAMS_ERROR));
+	var fields = Object.keys(req.query);
+	if(validParams(req.query) && fields.length){
+		var searchBy = fields[0];
+		var field = req.query[fields];
+		var search = {};				
+		search[searchBy] = searchBy === "price" ? field|0 : new RegExp('^' + field + '$', "i");
+		Product.find(search, (err,products) =>{
+			if(!err)
+				return res.json(products);
+			else return res.json(responseError(PRODUCT_NOT_FOUND_ERROR));
+		})
+	}else{
+		//Return all products in DB
+		Product.find({}, (err, prods) =>{
+			if(!err)
+				return res.json(prods);
+			else return res.json(responseError(PRODUCT_NOT_FOUND_ERROR))
+		})
+	}
 });
 
 //modifiy product information send id name description price image categories[]
 router.put('/product', (req, res) => {
-	Product.findOne({_id: new ObjectId(req.query._id)},
-	(err, product) => {
-		if(!err && product){
-			console.log(product + ' found.');
-			product.name = req.body.name ? req.body.name : product.name;
-			product.description = req.body.description ? req.body.description : product.description;
-			product.price = req.body.price ? req.body.price : product.price;
-			product.image = req.body.image ? req.body.image : product.image;
-			product.categories = req.body.categories ? req.body.categories : product.categories;
+	var id = req.query._id;
+	if(id && validParams(req.body)){
+		id = new ObjectId(id);
+		Product.findOne({_id: id},(err, product) => {
+			if(!err && product){
+				console.log(product + ' found.');
+				product.name = req.body.name ? req.body.name : product.name;
+				product.description = req.body.description ? req.body.description : product.description;
+				product.price = req.body.price ? req.body.price : product.price;
+				product.image = req.body.image ? req.body.image : product.image;
+				product.categories = req.body.categories ? req.body.categories : product.categories;
 
-			product.save((err, obj) => {
-				if (!err) {
-					console.log(obj.name + ' saved.');
-					res.json(obj);
-				}  	
-			});
-		}else res.json(responseError(CLIENT_NOT_FOUND_ERROR))
-	});
+				product.save((err, obj) => {
+					if (!err) {						
+						return res.json(obj);
+					}else return res.json(ELEMENT_NOT_SAVED_ERROR);
+				});
+			}else return res.json(responseError(PRODUCT_NOT_FOUND_ERROR))
+		});
+	}else return res.json(responseError(INVALID_PARAMS_ERROR));	
 });
 
 //delete product by id in body
 router.delete('/product', (req, res) => {
-	var id = new ObjectId(req.query._id);
-	Inventory.findOne((err,inventory) =>{
-		if(!err && inventory){
-			var index = -1;
-			inventory.items.forEach((item, i) =>{
-				if(item.product == id.toString()){
-					index = i;
-				}
-			});
-			if(index > -1){
-				inventory.items.splice(index,1);
-				inventory.save((err,savedInventory) =>{
-					if(!err){
-						Product.remove({_id: id}, (err, status) =>{
-							if(!err)
-								res.json(status);
-							else res.json(responseError(err));
-						})
-					}else res.json(responseError(err));
-				})
-			}else res.json(responseError(PRODUCT_NOT_FOUND_ERROR))
-		}else res.json(responseError(err));
-	})	
+	var id = req.query._id;
+	if(id){
+		id = new ObjectId(id);
+		Inventory.findOne((err,inventory) =>{
+			if(!err && inventory){
+				var index = -1;
+				inventory.items.forEach((item, i) =>{
+					if(item.product == id.toString()){
+						index = i;
+					}
+				});
+				if(index > -1){
+					inventory.items.splice(index,1);
+					inventory.save((err,savedInventory) =>{
+						if(!err){
+							Product.remove({_id: id}, (err, status) =>{
+								if(!err)
+									return res.json(status);
+								else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR));
+							})
+						}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR));
+					})
+				}else return res.json(responseError(PRODUCT_NOT_FOUND_ERROR))
+			}else return res.json(responseError(INVENTORY_NOT_FOUND_ERROR));
+		})
+	}else return res.json(responseError(INVALID_PARAMS_ERROR));		
 });
 
 /*************** CLIENT SECTION ***********************/
 
 //get client information send client _id as a parameter
 router.get('/client', (req, res) => {
-	Client.findOne({_id: new ObjectId(req.query._id)},
-	(err, client) => {
-		if(!err) console.log(client + ' found.');
-		res.json(client);
-	});
+	var id = req.query._id;
+	if(id){
+		id = new ObjectId(id);
+		Client.findOne({_id: id},	(err, client) => {
+			if(!err)
+				return res.json(client);
+			else
+				return res.json(responseError(CLIENT_NOT_FOUND_ERROR));
+		});
+	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));	
 });
 
 //get all clients
 router.get('/clients', (req, res) => {
 	Client.find({}, (err, clients) => {
 		if(!err) console.log(clients + ' found.');
-		res.json(clients);
+		return res.json(clients);
 	});
 });
 
 //modifiy client information send client updated information in the body
 router.put('/client', (req, res) => {
-	Client.findOne({_id: new ObjectId(req.query._id)},
-	(err, client) => {
-		if(!err && client){			
+	var id = req.session.id ? req.session.id : req.query._id;
+	if(id){
+		id = new ObjectId(id);
+		Client.findOne({_id: id},(err, client) => {
+		if(!err && client){		
 			client.name = req.body.name ? req.body.name : client.name;
 			client.lastName = req.body.lastName ? req.body.lastName : client.lastName;
 			client.password = req.body.password ? req.body.password : client.password;
@@ -460,23 +470,24 @@ router.put('/client', (req, res) => {
 			}
 
 			client.save((err, obj) => {
-				if (!err) {
+				if (!err && obj) {
 					console.log(obj.name + ' saved.');  		
 					sendVerification();
-					res.json(obj);
-				}  	
+					return res.json(obj);
+				}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR));
 			});
-		}else res.json(responseError(CLIENT_NOT_FOUND_ERROR))
+		}else return res.json(responseError(CLIENT_NOT_FOUND_ERROR))
 	});
+	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));	
 });
 
-//delete client by id in body
+//delete client by id
 router.delete('/client', (req, res) => {
 	Client.remove({_id: new ObjectId(req.query._id)},
 	(err, obj) => {
 		if(!err){			
-			res.json(obj);
-		}
+			return res.json(obj);
+		}else return res.json(ELEMENT_NOT_SAVED_ERROR)
 	});
 });
 
@@ -489,10 +500,10 @@ router.get('/cart', (req,res) =>{
 		id = new ObjectId(id);
 		Client.findOne({_id: id}, (err,client) =>{
 			if(!err && client){				
-				res.json(client.cart)				
-			}else	res.json(responseError(CLIENT_NOT_FOUND_ERROR))			
+				return res.json(client.cart)				
+			}else	return res.json(responseError(CLIENT_NOT_FOUND_ERROR))			
 		})
-	}else res.json(responseError(SESSION_EXPIRED_ERROR));
+	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));
 });
 
 //Clears a client's cart
@@ -506,12 +517,14 @@ router.delete('/cart', (req,res) =>{
 					orders: []						
 			};
 			client.save((err, savedClient) =>{
-				if(!err && savedClient) res.json(savedClient);
-				else res.json(responseError("Could not delete client's cart"))
-			})			
-		}else res.json(responseError(err));
+				if(!err && savedClient) 
+					return res.json(savedClient);
+				else 
+					return res.json(responseError("Could not delete client's cart"))
+			})		
+		}else return res.json(responseError(CLIENT_NOT_FOUND_ERROR));
 	})
-	}else res.json(responseError(SESSION_EXPIRED_ERROR));
+	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));
 });
 
 //add or remove products to/from client's cart
@@ -531,27 +544,26 @@ router.put('/cart', (req,res) =>{
 								client.cart.orders.push({"product": product, "ammount": ammount});
 								client.save((err, savedClient) =>{ //update client in DB.
 									if(!err){
-										res.json(savedClient);
-									}else res.json(err);
+										return res.json(savedClient);
+									}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR));
 								})
-							}else res.json(responseError(PRODUCT_NOT_FOUND_ERROR));
+							}else return res.json(responseError(PRODUCT_NOT_FOUND_ERROR));
 						})
-					}
-					if(action === "remove"){
+					}else	if(action === "remove"){
 						client.cart.orders.forEach((order, index) =>{
 							if(order.product == productId.toString()){
 								client.cart.orders.splice(index, 1);							
 							}						
 						})
 						client.save((err, savedClient) =>{
-								if(!err) res.json(savedClient);
-								else res.json(responseError(err));
+								if(!err) return res.json(savedClient);
+								else return res.json(responseError(err));
 							})
-					}
-				}else res.json(responseError(CLIENT_NOT_FOUND_ERROR));			
+					}else return res.json(responseError(UNSUPPORTED_ACTION_ERROR));
+				}else return res.json(responseError(CLIENT_NOT_FOUND_ERROR));			
 			})
-		}else res.json(responseError(INVALID_PARAMS_ERROR))	
-	}else res.json(responseError(SESSION_EXPIRED_ERROR));
+		}else return res.json(responseError(INVALID_PARAMS_ERROR))	
+	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));
 });
 
 /*Represents a sale. Clears client's cart and
@@ -559,51 +571,52 @@ updates bought items from Inventory*/
 router.post('/checkout', (req,res) =>{
 	var id = req.session.id;
 	if(id){		
-		id = ObjectId(id);
-		console.log(id)
+		id = new ObjectId(id);		
 		Client.findOne({_id: id}, (err, client) =>{
-			if(!err && client){ //no error												
-				Inventory.findOne((err,inventory) =>{ //get inventory
-					if(!err && inventory){
-						//Search products in inventory
-						for (var i = inventory.items.length - 1; i >= 0; i--) {
-							for (var j = client.cart.orders.length - 1; j >= 0; j--) {									
-								if(inventory.items[i].product.toString() === 
-									client.cart.orders[j].product.toString()){
-									//found product in inventory -> update ammounts available										
-									inventory.items[i].ammount -= client.cart.orders[j].ammount;																												
-								}
-							}	
-						}
-						//save inventory To db
-						inventory.save((err, savedInventory) =>{
-							//set disccount if needed
-							switch (client.boughtItems) {
-								case FIRST_DISCOUNT_REQUIREMENT:
-									client.cart.discount = FIRST_DISCOUNT;
-									break;
-								case SECOND_DISCOUNT_REQUIREMENT:
-									client.cart.discount = SECOND_DISCOUNT;
-									break;
-								case THIRD_DISCOUNT_REQUIREMENT:
-									client.cart.discount = THIRD_DISCOUNT;
-									THIRD_DISCOUNT_REQUIREMENT += THIRD_DISCOUNT_REQUIREMENT;
-									break;
-								default:																				
-									client.cart.discount = 0;
-									break;				
+			if(!err && client){ //no error
+				if(client.verified){
+					Inventory.findOne((err,inventory) =>{ //get inventory
+						if(!err && inventory){
+							//Search products in inventory
+							for (var i = inventory.items.length - 1; i >= 0; i--) {
+								for (var j = client.cart.orders.length - 1; j >= 0; j--) {									
+									if(inventory.items[i].product.toString() === 
+										client.cart.orders[j].product.toString()){
+										//found product in inventory -> update ammounts available										
+										inventory.items[i].ammount -= client.cart.orders[j].ammount;																												
+									}
+								}	
 							}
-							//increase client's bought items field
-							client.boughtItems += client.cart.orders.length
-							//clear client's cart
-							client.cart.orders = [];								
-							client.save((err,savedClient) =>{
-								if(!err) res.json(savedClient);
+							//save inventory To db
+							inventory.save((err, savedInventory) =>{
+								//set disccount if needed
+								switch (client.boughtItems) {
+									case FIRST_DISCOUNT_REQUIREMENT:
+										client.cart.discount = FIRST_DISCOUNT;
+										break;
+									case SECOND_DISCOUNT_REQUIREMENT:
+										client.cart.discount = SECOND_DISCOUNT;
+										break;
+									case THIRD_DISCOUNT_REQUIREMENT:
+										client.cart.discount = THIRD_DISCOUNT;
+										THIRD_DISCOUNT_REQUIREMENT += THIRD_DISCOUNT_REQUIREMENT;
+										break;
+									default:																				
+										client.cart.discount = 0;
+										break;				
+								}
+								//increase client's bought items field
+								client.boughtItems += client.cart.orders.length
+								//clear client's cart
+								client.cart.orders = [];								
+								client.save((err,savedClient) =>{
+									if(!err) return res.json(savedClient);
+								})
 							})
-						})
-					}else res.json(responseError(INVENTORY_NOT_FOUND_ERROR))
-				})								
-			}else res.json(responseError(CLIENT_NOT_FOUND_ERROR));				
+						}else return res.json(responseError(INVENTORY_NOT_FOUND_ERROR))
+					})
+				}else return res.json(responseError(UNSUPPORTED_ACTION_ERROR))	;
+			}else return res.json(responseError(CLIENT_NOT_FOUND_ERROR));				
 		});		
-	}else res.json(SESSION_EXPIRED_ERROR);
+	}else return res.json(SESSION_NOT_FOUND_ERROR);
 });
