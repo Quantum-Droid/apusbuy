@@ -25,9 +25,31 @@ angular.module('myApp.controllers', []).
       });
     }
   }).
-  controller('Controller_ClientProfile', function ($scope) {
-    // write Ctrl here
+  controller('Controller_ClientProfile', function ($scope, $http, $stateParams, $state) {
+    // Controller for managing a user's profile.
 
+    // Get client
+    $scope.getClient = function() {
+      $http.get(route + '/_id=' + $scope.client_id)
+      .then(function successCallback(response) {
+        $scope.prev_clientName = response.data.name
+        $scope.prev_clientLastName = response.data.lastName
+        $scope.prev_clientEmail = response.data.email
+        $scope.prev_clientVerified = response.data.verified
+        $scope.prev_clientPassword = response.data.password
+        $scope.prev_clientAddressStreet = response.data.address.street
+        $scope.prev_clientAddressPostalCode = response.data.address.postalCode
+        $scope.prev_clientAddressNumber = response.data.address.number
+        $scope.prev_clientAddressState = response.data.address.state
+        $scope.prev_clientAddressCity = response.data.address.city
+        $scope.prev_clientCreditCards = response.data.cards
+        $scope.prev_clientOrders = response.data.cart.orders
+        $scope.prev_clientDiscount = response.data.cart.discount
+        $scope.prev_clientNumberOfItemsBought = response.data.boughtItems
+      }, function errorCallback (response) {
+        console.log('Error while reaching client.');
+      });
+    }
   }).
   controller('Controller_ClientShoppingCart', function ($scope) {
     // write Ctrl here
@@ -75,14 +97,29 @@ angular.module('myApp.controllers', []).
     $scope.addSalesmanStatus = '';
     $scope.modifySalesmanStatus = '';
     $scope.deleteSalesmanStatus = '';
-    
-    $scope.getSalesmen = function() {
-      // GET method that obtains salesmen.
-      $http.get(route + '/admins')
+
+    // Getting the list of salesmen.
+    $scope.showSalesmen = function() {
+      $http.get(route + '/admins?role=Ventas')
       .then(function successCallback(response) {
         $scope.salesmen = response.data;
-      }, function errorCallback(response) {
-        console.log('Error getting salesmen.');
+      }, function successCallback (response) {
+        console.log('Couldn\'t load salesmen.');
+      });
+    }
+
+    $scope.showSalesmen();
+
+    // Sorting list of salesmen.
+    $scope.filterOptions = function(param) {
+      $scope.filterOption = param;
+    }
+
+    // Logout function
+    $scope.logout = function() {
+      $http.get(route + '/logout')
+      .then(function successCallback(response) {
+        $state.go('main_menu');
       })
     }
 
@@ -177,9 +214,7 @@ angular.module('myApp.controllers', []).
       });
     }
 
-    $scope.showAdmins();
-
-    // Sorting list of admins.
+    // Filtering list of admins.
     $scope.filterOptions = function(param) {
       $scope.filterOption = param;
     }
@@ -279,6 +314,9 @@ angular.module('myApp.controllers', []).
     /* ********************************************
                 END OF SUPER USER RIGHTS
        ******************************************** */
+
+    // Call showAdmins at beginning of execution.
+    $scope.showAdmins();
   }).
   controller('Controller_ProductDetail', function ($scope) {
     // write Ctrl here

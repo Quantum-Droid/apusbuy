@@ -10,11 +10,20 @@
 		Aquí podrás ver a los empleados registrados como Vendedores, y remover o agregar empleados a la lista.
 	</p>
 	<p>
-		<h4>Lista de vendedores</h4>
-		<ul>
-			<li>vendedor 1</li>
-			<li>vendedor 2</li>
-		</ul>
+		<h4>Información de los vendedores</h4>
+		<button ng-click="showSalesmen()">Refrescar</button>
+		<table class="table">
+			<tr>
+				<th><a ng-click="filterOptions('name')">Nombre</a></th>
+				<th><a ng-click="filterOptions('lastName')">Apellidos</a></th>
+				<th><a ng-click="filterOptions('email')">Email</a></th>
+			</tr>
+			<tr ng-repeat="salesman in salesmen | orderBy: filterOption">
+				<td>{{salesman.name}}</td>
+				<td>{{salesman.lastName}}</td>
+				<td>{{salesman.email}}</td>
+			</tr>
+		</table>
 	</p>
 	<p>
 		Acciones posibles:
@@ -27,46 +36,46 @@
 	<p>
 		<h4>Agregar vendedor</h4>
 		<form name="addSalesmanForm" novalidate>
-			Nombre: <input type="text" name="new_name" ng-model="new_name" ng-required="true" />
+			Nombre: <input type="text" name="new_name" ng-model="new_name" ng-required="true" class="form-control" />
 			<span class="error-message" ng-show="addSalesmanForm.new_name.$dirty && addSalesmanForm.new_name.$error.required">
 				El nombre es necesario.
 			</span> <br/>
-			Apellidos: <input type="text" name="new_lastName" ng-model="new_lastName" ng-required="true" />
+			Apellidos: <input type="text" name="new_lastName" ng-model="new_lastName" ng-required="true" class="form-control" />
 			<span class="error-message" ng-show="addSalesmanForm.new_lastName.$dirty && addSalesmanForm.new_lastName.$error.required">
 				Los apellidos son necesarios.
 			</span> <br/>
-			Email: <input type="text" name="new_email" ng-model="new_email" ng-required="true" />
+			Email: <input type="text" name="new_email" ng-model="new_email" ng-required="true" class="form-control" />
 			<span class="error-message" ng-show="addSalesmanForm.new_email.$dirty && addSalesmanForm.new_email.$error.required">
 				El email es necesario.
 			</span> <br/>
-			Contraseña: <input type="password" name="new_password" ng-model="new_password" ng-required="true" />
+			Contraseña: <input type="password" name="new_password" ng-model="new_password" ng-required="true" class="form-control" />
 			<span class="error-message" ng-show="addSalesmanForm.new_password.$dirty && addSalesmanForm.new_password.$error.required">
 				La contraseña es necesaria.
 			</span>
 		</form>
-		<button ng-click="addSalesman()">Agregar</button> {{addSalesmanStatus}}
+		<button ng-click="addSalesman(); showSalesmen()">Agregar</button> {{addSalesmanStatus}}
 	</p>
 	<p>
 		<h4>Modificar vendedor</h4>
 		<form name="addSalesmanForm" novalidate>
-			Email (cuenta del vendedor): <input type="text" name="new_email" ng-model="new_email" ng-required="true" />
+			Email (cuenta del vendedor): <input type="text" name="new_email" ng-model="new_email" ng-required="true" class="form-control" />
 			<span class="error-message" ng-show="addSalesmanForm.new_email.$dirty && addSalesmanForm.new_email.$error.required">
 				El email es necesario para saber a qué cuenta se le harán modificaciones.
 			</span> <br/>
-			Nombre: <input type="text" name="existing_name" ng-model="existing_name" /> <br/>
-			Apellidos: <input type="text" name="existing_lastName" ng-model="existing_lastName" /> <br/>
-			Contraseña: <input type="password" name="existing_password" ng-model="existing_password" /> <br/>
+			Nombre: <input type="text" name="existing_name" ng-model="existing_name" class="form-control" /> <br/>
+			Apellidos: <input type="text" name="existing_lastName" ng-model="existing_lastName" class="form-control" /> <br/>
+			Contraseña: <input type="password" name="existing_password" ng-model="existing_password" class="form-control" /> <br/>
 		</form>
-		<button ng-click="modifySalesman()">Modificar</button> {{modifySalesmanStatus}}
+		<button ng-click="modifySalesman(); showSalesmen()">Modificar</button> {{modifySalesmanStatus}}
 	</p>
 	<p>
 		<h4>Dar de baja vendedor</h4>
 		<form name="deleteSalesmanForm" novalidate>
-			Email del vendedor: <input type="text" name="salesmanEmailToDelete" ng-model="salesmanEmailToDelete" ng-required="true"/>
+			Email del vendedor: <input type="text" name="salesmanEmailToDelete" ng-model="salesmanEmailToDelete" ng-required="true" class="form-control"/>
 			<span class="error-message" ng-show="deleteSalesmanForm.salesmanEmailToDelete.$dirty && deleteSalesmanForm.salesmanEmailToDelete.$error.required">
 				Por favor introduzca el email del vendedor que desea dar de baja.
 			</span>
 		</form>
-		<button ng-click="deleteSalesman()">Dar de baja</button> {{deleteSalesmanStatus}}
+		<button ng-click="deleteSalesman(); showSalesmen()">Dar de baja</button> {{deleteSalesmanStatus}}
 	</p>
 </div>
