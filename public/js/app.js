@@ -36,6 +36,11 @@ config(function ($stateProvider, $urlRouterProvider) {
       templateUrl: 'partials/client_shopping_cart.html',
       controller: 'Controller_ClientShoppingCart'
     }).
+    state('client_register', {
+      url: '/client_register',
+      templateUrl: 'partials/client_register.html',
+      controller: 'Controller_ClientRegister'
+    }).
     // Admin
     state('admin_login', {
       url: '/admin_login/:admin_id',

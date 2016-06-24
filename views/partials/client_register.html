@@ -1,0 +1,81 @@
+<div class="container">
+	<!-- Template for registering a new client. A verification email is sent once the petition is sent. -->
+	<h3>
+		Registrarse
+	</h3>
+	<p>
+		Bienvenido a Apu's Buy, por favor introduce la información necesaria para registrarte y ¡empezar a comprar!
+	</p>
+	<form name="client_register_form" novalidate>
+		<!-- Maybe change input to EMAIL? -->
+		Correo electrónico: <br/>
+		<input type="text" name="clientEmail" ng-model="clientEmail" class="form-control" />
+		<span class="error-message" ng-show="client_register_form.clientEmail.$dirty && client_register_form.clientEmail.$error.required">
+				Por favor introduzca su correo electrónico.
+		</span>
+		<br/>
+		Nombre: <br/>
+		<input type="text" name="clientName" ng-model="clientName" class="form-control" />
+		<span class="error-message" ng-show="client_register_form.clientName.$dirty && client_register_form.clientName.$error.required">
+				Por favor introduzca su nombre.
+		</span>
+		<br/>
+		Apellidos: <br/>
+		<input type="text" name="clientLastName" ng-model="clientLastName" class="form-control" />
+		<span class="error-message" ng-show="client_register_form.clientLastName.$dirty && client_register_form.clientLastName.$error.required">
+				Por favor introduzca sus apellidos.
+		</span>
+		<br/>
+		Profile picture: <br/>
+		<input type="text" name="clientProfilePicture" ng-model="clientProfilePicture" class="form-control" />
+		<span class="error-message" ng-show="client_register_form.clientProfilePicture.$dirty && client_register_form.clientProfilePicture.$error.required">
+				Por favor introduzca una URL para su foto de perfil.
+		</span>
+		<br/>
+		<b>Dirección:</b> <br/><br/>
+		Calle:  <br/>
+		<input type="text" name="clientAddressStreet" ng-model="clientAddressStreet" class="form-control" />
+		<span class="error-message" ng-show="client_register_form.clientAddressStreet.$dirty && client_register_form.clientAddressStreet.$error.required">
+				Por favor introduzca su Calle.
+		</span>
+		<br/>
+		Número: <br/>
+		<input type="text" name="clientAddressNumber" ng-model="clientAddressNumber" class="form-control" />
+		<span class="error-message" ng-show="client_register_form.clientAddressNumber.$dirty && client_register_form.clientAddressNumber.$error.required">
+				Por favor introduzca el número de su casa.
+		</span>
+		<br/>
+		Código postal: <br/>
+		<input type="text" name="clientAddressPostalCode" ng-model="clientAddressPostalCode" class="form-control" />
+		<span class="error-message" ng-show="client_register_form.clientAddressPostalCode.$dirty && client_register_form.clientAddressPostalCode.$error.required">
+				Por favor introduzca su código postal.
+		</span>
+		<br/>
+		Estado: <br/>
+		<input type="text" name="clientAddressState" ng-model="clientAddressState" class="form-control" />
+		<span class="error-message" ng-show="client_register_form.clientAddressState.$dirty && client_register_form.clientAddressState.$error.required">
+				Por favor introduzca su estado.
+		</span>
+		<br/>
+		Ciudad: <br/>
+		<input type="text" name="clientAddressCity" ng-model="clientAddressCity" class="form-control" />
+		<span class="error-message" ng-show="client_register_form.clientAddressCity.$dirty && client_register_form.clientAddressCity.$error.required">
+				Por favor introduzca su ciudad, municipio o delegación.
+		</span>
+		<br/>
+		Contraseña: <input type="password" name="clientPassword" ng-model="clientPassword" class="form-control" />
+		<span class="error-message" ng-show="client_register_form.clientPassword.$dirty && client_register_form.clientPassword.$error.required">
+				Por favor introduzca su contraseña.
+		</span>
+		<br/>
+		Repetir contraseña: <input type="password" name="clientPasswordRepeat" ng-model="clientPasswordRepeat" class="form-control" />
+		<span class="error-message" ng-show="client_register_form.clientPasswordRepeat.$dirty && client_register_form.clientPasswordRepeat.$error.required">
+				Por favor repita su contraseña.
+		</span>
+		<br/>
+	</form>
+	<button ng-click="registerClient()" class="btn btn-success">Registrarse</button> {{clientRegisterStatus}}<br/>
+	<p>
+		
+	</p>
+</div>

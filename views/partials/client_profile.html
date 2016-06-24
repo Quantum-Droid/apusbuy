@@ -9,10 +9,10 @@
 	<p>
 		<h4>Mi perfil</h4>
 		Para editar información, puedes rellenar los campos y hacer clic en 'Guardar cambios'.
-		<form name="user_login_form" novalidate>
+		<form name="client_login_form" novalidate>
 			<!-- Maybe change input to EMAIL? -->
 			Nombre: <br/>
-			<input type="text" name="clientName" ng-model="clientName" class="form-control" value="prev_clientName"/>
+			<input type="text" name="clientName" ng-model="clientName" class="form-control" />
 			<br/>
 			Apellidos: <br/>
 			<input type="text" name="clientLastName" ng-model="clientLastName" class="form-control" />
@@ -43,7 +43,7 @@
 			Repetir contraseña: <input type="password" name="clientPasswordRepeat" ng-model="clientPasswordRepeat" class="form-control" />
 			<br/>
 		</form>
-		<button ng-click="saveClientChanges()" class="btn btn-success">Guardar cambios</button> <br/><br/>
+		<button ng-click="saveClientChanges()" class="btn btn-success">Guardar cambios</button> {{saveClientChangesStatus}} <br/><br/>
 		Cuenta de correo: {{clientEmail}} <br/>
 		Verificado: {{clientVerified}}
 	</p>

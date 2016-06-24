@@ -9,6 +9,8 @@ angular.module('myApp.controllers_client', []).
 
   }).
   controller('Controller_ClientLogin', function ($scope, $http, $stateParams, $state) {
+    // Controller for managing a client's login; it can also redirect to register page.
+
     // Client login page
     $scope.login = function() {
       $http.post(route + '/clientLogin', {
@@ -23,6 +25,11 @@ angular.module('myApp.controllers_client', []).
       }, function errorCallback(response) {
         console.log('Could\'t login client.');
       });
+    }
+
+    // Redirect to client register.
+    $scope.loadRegister = function() {
+      $state.go('client_register');
     }
   }).
   controller('Controller_ClientProfile', function ($scope, $http, $stateParams, $state) {
@@ -71,10 +78,53 @@ angular.module('myApp.controllers_client', []).
         "city":$scope.clientAddressCity,
         // NOTE --> change once CreditCards are implemented.
         "cards":null
-      })
+      });
     }
 
     $scope.getClient();
+  }).
+  controller('Controller_ClientRegister', function ($scope, $http, $state, $stateParams) {
+    // Controller for registering a new client.
+
+    // To start register, must check if account (email) is already taken. If not, we cal the POST method.
+    $scope.registerClient = function() {
+      $http.get(route + '/clients?email=' + $scope.clientEmail)
+      .then(function successCallback(response) {
+        if (response.data === null) {
+          $scope.makeClientPOST();
+          console.log('calling makeClientPOST.');
+        } else {
+          $scope.clientRegisterStatus = 'Esta cuenta de correo ya está siendo utilizada.'
+        }
+      }, function errorCallback(response) {
+        $scope.clientRegisterStatus = 'No se logró hacer la petición.'
+      });
+    }
+
+    // Register client POST method.
+    $scope.makeClientPOST = function() {
+      if ($scope.clientPassword === $scope.clientPasswordRepeat) {
+        $http.post(route + '/register', {
+          "email":$scope.clientEmail,
+          "name":$scope.clientName,
+          "lastName":$scope.clientLastName,
+          "street":$scope.clientAddressStreet,
+          "number":$scope.clientAddressNumber,
+          "state":$scope.clientAddressState,
+          "city":$scope.clientAddressCity,
+          "password":$scope.clientPassword,
+          // NOTE --> Uncomment when available.
+          //"profilePicture":$scope.clientProfilePicture
+        })
+        .then(function successCallback(response) {
+          $scope.clientRegisterStatus = 'Tu cuenta se ha creado exitosamente. \nPor favor revisa tu correo para verificarla.'
+        }, function errorCallback(response) {
+          $scope.clientRegisterStatus = 'Error al crear la cuenta.'
+        });
+      } else {
+        $scope.clientRegisterStatus = 'No se puede registar cuenta con esos datos.';
+      }
+    }
   }).
   controller('Controller_ClientShoppingCart', function ($scope) {
     // write Ctrl here
