@@ -3,18 +3,21 @@
     "name": "Laptop Dell",
     "description": "Latop muy cool",
     "price": 3500,
+    "image": "http://ecx.images-amazon.com/images/I/71lyBaN-vAL._SL1500_.jpg",
     "categories": ["Electronicos", "Cómputo", "Gadgets"]
   },
   {
     "name": "Audifonos Bose",
     "description": "Audifonos muy cool",
     "price": 760.99,
+    "image": "http://ecx.images-amazon.com/images/I/71lyBaN-vAL._SL1500_.jpg",
     "categories": ["Electronicos", "Audio", "Gadgets"]
   },
   {
     "name": "Funda iPhone 6S",
     "description": "Funda muy cool",
     "price": 200,
+    "image": "http://applesencia.com/files/2014/09/iphone-6-funda-spigen-tough-armor.jpg",
     "categories": ["Accsesorio", "Gadgets"]
   }
 ]

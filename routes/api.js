@@ -192,26 +192,132 @@ router.post('/adminLogin', (req, res) => {
 		}else return res.json(responseError(ADMIN_NOT_FOUND_ERROR))				
 	});	
 });
-/*************** ADMIN SECTION ***********************/
 
-//get admin information based on the specified parameter
-router.get('/admin', (req, res) => {
-	var fields = Object.keys(req.query);
-	if(validParams(req.query) && fields.length){
-				var searchBy = fields[0];
-				var field = req.query[fields];
-				var search = {};
-				search[searchBy] = new RegExp('^' + field + '$', "i");
-				Admin.findOne(search, (err, admin) =>{
-					if(!err){
-						return res.json(admin)
-					}else return res.json(responseError(ADMIN_NOT_FOUND_ERROR))
-				})
-	}else return res.json(responseError(INVALID_PARAMS_ERROR));
+/*************** CLIENT SECTION ***********************/
+
+//get client information send client _id as a parameter
+router.get('/client', (req, res) => {
+	var id = req.session.id;
+	if(id){
+		id = new ObjectId(id);
+		Client.findOne({_id: id},	(err, client) => {
+			if(!err)
+				return res.json(client);
+			else
+				return res.json(responseError(CLIENT_NOT_FOUND_ERROR));
+		});
+	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));	
 });
 
-//create accounts for the different managment roles
-//send name, lastname, email password and role in hte body
+//get all clients
+router.get('/clients', (req, res) => {
+	var fields = Object.keys(req.query);
+	if(validParams(req.query) && fields.length){
+		var searchBy = fields[0];
+		var field = req.query[fields];
+		var search = {};				
+		search[searchBy] = searchBy === "_id" ? field : new RegExp('^' + field + '$', "i");
+		Client.find(search,(err,clients) =>{
+			return res.json(clients ? clients.length : 0);
+		})
+	}else{
+		Client.find({}, (err, clients) => {		
+		return res.json(clients ? clients.length : 0);
+	});
+	}	
+});
+
+//modifiy client information send client updated information in the body
+router.put('/client', (req, res) => {
+	var id = req.session.id;
+	if(id){
+		id = new ObjectId(id);
+		Client.findOne({_id: id},(err, client) => {
+		if(!err && client){		
+			client.name = req.body.name ? req.body.name : client.name;
+			client.lastName = req.body.lastName ? req.body.lastName : client.lastName;
+			client.password = req.body.password ? req.body.password : client.password;
+			client.address.street = req.body.street ? req.body.street : client.address.street;
+			client.address.postalCode = req.body.postalCode ? req.body.postalCode : client.address.postalCode;
+			client.address.number = req.body.number ? req.body.number : client.address.number;
+			client.address.state = req.body.state ? req.body.state : client.address.state;
+			client.address.city = req.body.city ? req.body.city : client.address.city;
+			client.cards = req.body.cards ?req.body.cards : client.cards;
+		
+			if(client.email !== req.body.email){
+				client.verified = false;
+				client.email = req.body.email;
+				console.log(client.name + " needs to verify at " + client.email);
+				sendVerification(client._id, client.email);
+			}
+
+			client.save((err, obj) => {
+				if (!err && obj) {
+					console.log(obj.name + ' saved.');  		
+					sendVerification();
+					return res.json(obj);
+				}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR));
+			});
+		}else return res.json(responseError(CLIENT_NOT_FOUND_ERROR))
+	});
+	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));	
+});
+
+/*
+* Delete client by id
+* ADMIN SESSION WITH SUPER_USER ROLE CAN DELETE ANYONE
+*/
+router.delete('/client', (req, res) => {
+	var id = req.query._id;
+	var role = req.session.role;	
+	//admin trying to delete user
+	if(role === SU_ROLE){
+		id = new ObjectId(id);
+		Client.remove({_id: id},(err, obj) => {			
+				return res.json(obj);			
+		});	
+	}else return res.json(responseError(UNSUPPORTED_ACTION_ERROR));
+
+	//Client trying to delete client
+	if(req.session.id && !role){
+		console.log("no role")
+		id = new ObjectId(req.session.id);		
+		Client.remove({_id: id},(err, obj) => {	
+				req.session = null;
+				return res.json(obj);			
+		});	
+
+	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));
+});
+
+
+/*************** ADMIN SECTION ***********************/
+
+/*
+* Get admin information based on the specified parameter
+*/
+router.get('/admin', (req, res) => {
+	if(req.session.id && getRolePriority(req.session.role) > 0){
+		var fields = Object.keys(req.query);		
+		if(validParams(req.query) && fields.length){
+					var searchBy = fields[0];
+					var field = req.query[fields];
+					var search = {};
+					search[searchBy] = searchBy === "_id" ? field : new RegExp('^' + field + '$', "i");
+					console.log(search);
+					Admin.findOne(search, (err, admin) =>{
+						if(!err)
+							return res.json(admin)
+						else return res.json(responseError(ADMIN_NOT_FOUND_ERROR))
+					})
+		}else return res.json(responseError(INVALID_PARAMS_ERROR));
+	}else res.json(responseError(UNSUPPORTED_ACTION_ERROR))	;
+});
+
+/*
+* Create account for the different managment roles
+* send name, lastname, email password and role in hte body
+*/
 router.post('/admin', (req, res) => {	
 	var admin = new Admin();
   admin.name = req.body.name;
@@ -219,13 +325,14 @@ router.post('/admin', (req, res) => {
   admin.email = req.body.email;
   admin.password = req.body.password;
   admin.role = req.body.role
-  
-  admin.save((err, obj) => {
+  if(req.session.id && req.session.role === SU_ROLE){
+  	admin.save((err, obj) => {
   	if (!err && obj) {
   		console.log(obj.name + ' saved as admin.');  		
   		return res.json(obj);
   	}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR))
   }); 
+  } else return res.json(responseError(UNSUPPORTED_ACTION_ERROR)) ;
 });
 
 /*
@@ -233,47 +340,53 @@ router.post('/admin', (req, res) => {
 * If no field is specified, all admins are retrived
 */
 router.get('/admins', (req, res) => {
-	var fields = Object.keys(req.query);
-	if(validParams(req.query) && fields.length){
-		var searchBy = fields[0];
-		var field = req.query[fields];
-		var search = {};
-		search[searchBy] = new RegExp('^' + field + '$', "i");
-		Admin.find(search, (err, admins) =>{
-			if(!err)
-				return res.json(admins)
-			else return res.json(responseError(ADMIN_NOT_FOUND_ERROR))
-		})
-	}else{
-		//Return all admins in DB
-		Admin.find({}, (err, admins) => {
-			if(!err)
-				return res.json(admins);
-			else
-				return res.json(responseError(ADMIN_NOT_FOUND_ERROR))
-		});
-	}
+	if(req.session.id && getRolePriority(req.session.role) > 0){
+		var fields = Object.keys(req.query);
+		if(validParams(req.query) && fields.length){
+			var searchBy = fields[0];
+			var field = req.query[fields];
+			var search = {};
+			search[searchBy] = new RegExp('^' + field + '$', "i");
+			Admin.find(search, (err, admins) =>{
+				if(!err)
+					return res.json(admins)
+				else return res.json(responseError(ADMIN_NOT_FOUND_ERROR))
+			})
+		}else{
+			//Return all admins in DB
+			Admin.find({}, (err, admins) => {
+				if(!err)
+					return res.json(admins);
+				else
+					return res.json(responseError(ADMIN_NOT_FOUND_ERROR))
+			});
+		}
+	}else return res.json(responseError(UNSUPPORTED_ACTION_ERROR));
 });
 
-//modifiy admin information send admin updated information in the body
+/*
+* Modifiy admin information send admin updated information in the body
+*/
 router.put('/admin', (req, res) => {	
-	if(validParams(req.query)){
-		Admin.findOne({_id: new ObjectId(req.query._id)},
-		(err, admin) => {
-			if(!err && admin){				
-				admin.name = req.body.name ? req.body.name : admin.name;
-				admin.lastName = req.body.lastName ? req.body.lastName : admin.lastName;
-				admin.email = req.body.email ? req.body.email : admin.email;
-				admin.password = req.body.password ? req.body.password : admin.password;
-				admin.role = req.body.role ? req.body.role : admin.role;
-				admin.save((err, obj) => {
-					if (!err && obj) {						
-						return res.json(obj);
-					}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR));
-				});
-			}else return res.json(responseError(ADMIN_NOT_FOUND_ERROR));
-		});
-	}return res.json(responseError(INVALID_PARAMS_ERROR));
+	if(req.session.id && getRolePriority(req.session.role) > 0){
+		if(validParams(req.query)){
+			Admin.findOne({_id: new ObjectId(req.query._id)},
+			(err, admin) => {
+				if(!err && admin){				
+					admin.name = req.body.name ? req.body.name : admin.name;
+					admin.lastName = req.body.lastName ? req.body.lastName : admin.lastName;
+					admin.email = req.body.email ? req.body.email : admin.email;
+					admin.password = req.body.password ? req.body.password : admin.password;
+					admin.role = req.body.role ? req.body.role : admin.role;
+					admin.save((err, obj) => {
+						if (!err && obj) {						
+							return res.json(obj);
+						}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR));
+					});
+				}else return res.json(responseError(ADMIN_NOT_FOUND_ERROR));
+			});
+		}else return res.json(responseError(INVALID_PARAMS_ERROR));
+	}else return res.json(responseError(UNSUPPORTED_ACTION_ERROR))
 });
 
 //delete admin by id in body
@@ -281,7 +394,7 @@ router.delete('/admin', (req, res) => {
 	var role = req.session.role;
 	var id = req.session.id;
 	var toRemove = req.query._id;
-	if(id && role){
+	if(id && getRolePriority(role) > 0){
 		if(toRemove){
 			toRemove = new ObjectId(toRemove);
 			Admin.findOne({_id: toRemove}, (err, admin) =>{
@@ -297,7 +410,7 @@ router.delete('/admin', (req, res) => {
 				}else return res.json(responseError(ADMIN_NOT_FOUND_ERROR));
 			})
 		}else return res.json(responseError(INVALID_PARAMS_ERROR));
-	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));
+	}else return res.json(responseError(UNSUPPORTED_ACTION_ERROR));
 });
 
 /*************** PRODUCT SECTION ***********************/
@@ -420,77 +533,6 @@ router.delete('/product', (req, res) => {
 		})
 	}else return res.json(responseError(INVALID_PARAMS_ERROR));		
 });
-
-/*************** CLIENT SECTION ***********************/
-
-//get client information send client _id as a parameter
-router.get('/client', (req, res) => {
-	var id = req.query._id;
-	if(id){
-		id = new ObjectId(id);
-		Client.findOne({_id: id},	(err, client) => {
-			if(!err)
-				return res.json(client);
-			else
-				return res.json(responseError(CLIENT_NOT_FOUND_ERROR));
-		});
-	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));	
-});
-
-//get all clients
-router.get('/clients', (req, res) => {
-	Client.find({}, (err, clients) => {
-		if(!err) console.log(clients + ' found.');
-		return res.json(clients);
-	});
-});
-
-//modifiy client information send client updated information in the body
-router.put('/client', (req, res) => {
-	var id = req.session.id ? req.session.id : req.query._id;
-	if(id){
-		id = new ObjectId(id);
-		Client.findOne({_id: id},(err, client) => {
-		if(!err && client){		
-			client.name = req.body.name ? req.body.name : client.name;
-			client.lastName = req.body.lastName ? req.body.lastName : client.lastName;
-			client.password = req.body.password ? req.body.password : client.password;
-			client.address.street = req.body.street ? req.body.street : client.address.street;
-			client.address.postalCode = req.body.postalCode ? req.body.postalCode : client.address.postalCode;
-			client.address.number = req.body.number ? req.body.number : client.address.number;
-			client.address.state = req.body.state ? req.body.state : client.address.state;
-			client.address.city = req.body.city ? req.body.city : client.address.city;
-			client.cards = req.body.cards ?req.body.cards : client.cards;
-		
-			if(client.email !== req.body.email){
-				client.verified = false;
-				client.email = req.body.email;
-				console.log(client.name + " needs to verify at " + client.email);
-				sendVerification(client._id, client.email);
-			}
-
-			client.save((err, obj) => {
-				if (!err && obj) {
-					console.log(obj.name + ' saved.');  		
-					sendVerification();
-					return res.json(obj);
-				}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR));
-			});
-		}else return res.json(responseError(CLIENT_NOT_FOUND_ERROR))
-	});
-	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));	
-});
-
-//delete client by id
-router.delete('/client', (req, res) => {
-	Client.remove({_id: new ObjectId(req.query._id)},
-	(err, obj) => {
-		if(!err){			
-			return res.json(obj);
-		}else return res.json(ELEMENT_NOT_SAVED_ERROR)
-	});
-});
-
 
 /*************** CART SECTION ***********************/
 //get client cart
