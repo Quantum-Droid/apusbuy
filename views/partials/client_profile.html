@@ -11,29 +11,29 @@
 		Para editar información, puedes rellenar los campos y hacer clic en 'Guardar cambios'.
 		<form name="user_login_form" novalidate>
 			<!-- Maybe change input to EMAIL? -->
-			Nombre: {{prev_clientName}} <br/>
-			<input type="text" name="clientName" ng-model="clientName" class="form-control" />
+			Nombre: <br/>
+			<input type="text" name="clientName" ng-model="clientName" class="form-control" value="prev_clientName"/>
 			<br/>
-			Apellidos: {{prev_clientLastName}} <br/>
+			Apellidos: <br/>
 			<input type="text" name="clientLastName" ng-model="clientLastName" class="form-control" />
 			<br/>
-			Profile picture: {{prev_clientProfilePicture}} <br/>
+			Profile picture: <br/>
 			<input type="text" name="clientProfilePicture" ng-model="clientProfilePicture" class="form-control" />
 			<br/>
-			Dirección: <br/>
-			Calle: {{prev_clientAddressStreet}} <br/>
+			<b>Dirección:</b> <br/><br/>
+			Calle:  <br/>
 			<input type="text" name="clientAddressStreet" ng-model="clientAddressStreet" class="form-control" />
 			<br/>
-			Número: {{prev_clientAddressNumber}} <br/>
+			Número: <br/>
 			<input type="text" name="clientAddressNumber" ng-model="clientAddressNumber" class="form-control" />
 			<br/>
-			Código postal: {{prev_clientAddressPostalCode}} <br/>
-			<input type="text" name="clientAddressPC" ng-model="clientAddressPC" class="form-control" />
+			Código postal: <br/>
+			<input type="text" name="clientAddressPostalCode" ng-model="clientAddressPostalCode" class="form-control" />
 			<br/>
-			Estado: {{prev_clientAddressState}} <br/>
+			Estado: <br/>
 			<input type="text" name="clientAddressState" ng-model="clientAddressState" class="form-control" />
 			<br/>
-			Ciudad: {{prev_clientAddressCity}} <br/>
+			Ciudad: <br/>
 			<input type="text" name="clientAddressCity" ng-model="clientAddressCity" class="form-control" />
 			<br/>
 			Contraseña anterior: <input type="password" name="prev_clientPassword" ng-model="prev_clientPassword" class="form-control" />
@@ -43,14 +43,14 @@
 			Repetir contraseña: <input type="password" name="clientPasswordRepeat" ng-model="clientPasswordRepeat" class="form-control" />
 			<br/>
 		</form>
-		<button ng-click="saveClientChanges()">Guardar cambios</button> <br/><br/>
+		<button ng-click="saveClientChanges()" class="btn btn-success">Guardar cambios</button> <br/><br/>
 		Cuenta de correo: {{clientEmail}} <br/>
 		Verificado: {{clientVerified}}
 	</p>
 	<p>
 		<h4>Mis compras</h4>
 		<p>
-			Número total de compras: {{clientTotalPurchases}} <br/>
+			Descuento: {{client}} <br/>
 			<button ng-click="loadShoppingCart()">Mi carrito de compras</button>
 		</p>
 	</p>

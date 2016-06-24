@@ -3,7 +3,9 @@
 // Declare app level module which depends on filters, and services
 
 angular.module('myApp', [
-  'myApp.controllers',
+  'myApp.controllers_client',
+  'myApp.controllers_admin',
+  'myApp.controllers_product',
   'myApp.filters',
   'myApp.services',
   'myApp.directives',
