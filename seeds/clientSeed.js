@@ -43,14 +43,25 @@ db.once('open', () =>{
             if(!err && products.length){
                 async.eachSeries(products, (product, callback) =>{
                     client.cart.orders.push({product: product._id, ammount: 1});
-                    client.save((err,c) =>{
-                        callback();
-                    });
                 }, (err) =>{
                     console.log('Clients seeded');
                     process.exit();
                 })
             }
+        })
+        client.save((err,c) =>{
+            var client2 = new Client();
+            client2.name = "Testi";
+            client2.lastName = "Cle.";
+            client2.email = "testi.cle@itesm.mx";
+            client2.password = "password";
+            client2.verified = false;
+            client2.address = null; 
+            client.cards = [];
+            client.cart.discount = 0;
+            client2.save((err,c2) =>{
+                callback();
+            })
         })
 
 	});
