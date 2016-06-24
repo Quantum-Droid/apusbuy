@@ -90,11 +90,12 @@ angular.module('myApp.controllers_client', []).
     $scope.registerClient = function() {
       $http.get(route + '/clients?email=' + $scope.clientEmail)
       .then(function successCallback(response) {
-        if (response.data === null) {
-          $scope.makeClientPOST();
-          console.log('calling makeClientPOST.');
-        } else {
+        // If response.data !== 0, it means there are already accounts with that email.
+        var anyAccountsWithEmail = response.data;
+        if (anyAccountsWithEmail) {
           $scope.clientRegisterStatus = 'Esta cuenta de correo ya está siendo utilizada.'
+        } else {
+          $scope.makeClientPOST();
         }
       }, function errorCallback(response) {
         $scope.clientRegisterStatus = 'No se logró hacer la petición.'
