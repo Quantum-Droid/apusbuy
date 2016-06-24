@@ -55,9 +55,9 @@ angular.module('myApp.controllers_client', []).
         $scope.clientCartDiscount = response.data.cart.discount
         $scope.clientNumberOfItemsBought = response.data.boughtItems
         if (clientIsVerified) {
-          $scope.clientVerfied = 'Yes';
+          $scope.clientVerified = 'Yes';
         } else {
-          $scope.clientVerfied = 'No';
+          $scope.clientVerified = 'No';
         }
       }, function errorCallback (response) {
         console.log('Error while reaching client. ');
@@ -81,6 +81,17 @@ angular.module('myApp.controllers_client', []).
       });
     }
 
+    // Delete client account.
+    $scope.deleteClient = function() {
+      $http.delete(route + '/client')
+      .then(function successCallback(response) {
+        $state.go('client_account_deleted');
+        console.log('Account deleted.');
+      }, function errorCallback(response) {
+        console.log('Couldn\'t delete account.');
+      });
+    }
+
     $scope.getClient();
   }).
   controller('Controller_ClientRegister', function ($scope, $http, $state, $stateParams) {
@@ -91,11 +102,10 @@ angular.module('myApp.controllers_client', []).
       $http.get(route + '/clients?email=' + $scope.clientEmail)
       .then(function successCallback(response) {
         // If response.data !== 0, it means there are already accounts with that email.
-        var anyAccountsWithEmail = response.data;
-        if (anyAccountsWithEmail) {
-          $scope.clientRegisterStatus = 'Esta cuenta de correo ya está siendo utilizada.'
-        } else {
+        if (response.data === '0') {
           $scope.makeClientPOST();
+        } else {
+          $scope.clientRegisterStatus = 'Esta cuenta de correo ya está siendo utilizada.';
         }
       }, function errorCallback(response) {
         $scope.clientRegisterStatus = 'No se logró hacer la petición.'
@@ -106,14 +116,14 @@ angular.module('myApp.controllers_client', []).
     $scope.makeClientPOST = function() {
       if ($scope.clientPassword === $scope.clientPasswordRepeat) {
         $http.post(route + '/register', {
-          "email":$scope.clientEmail,
-          "name":$scope.clientName,
-          "lastName":$scope.clientLastName,
-          "street":$scope.clientAddressStreet,
-          "number":$scope.clientAddressNumber,
-          "state":$scope.clientAddressState,
-          "city":$scope.clientAddressCity,
-          "password":$scope.clientPassword,
+          "email":$scope.clientEmail || '',
+          "name":$scope.clientName || '',
+          "lastName":$scope.clientLastName || '',
+          "street":$scope.clientAddressStreet || '',
+          "number":$scope.clientAddressNumber || '',
+          "state":$scope.clientAddressState || '',
+          "city":$scope.clientAddressCity || '',
+          "password":$scope.clientPassword || 'password',
           // NOTE --> Uncomment when available.
           //"profilePicture":$scope.clientProfilePicture
         })
@@ -123,12 +133,19 @@ angular.module('myApp.controllers_client', []).
           $scope.clientRegisterStatus = 'Error al crear la cuenta.'
         });
       } else {
-        $scope.clientRegisterStatus = 'No se puede registar cuenta con esos datos.';
+        $scope.clientRegisterStatus = 'Las contraseñas no coinciden.';
       }
     }
   }).
   controller('Controller_ClientShoppingCart', function ($scope) {
     // write Ctrl here
 
+  }).
+  controller('Controller_ClientVerify', function ($scope, $state) {
+    // For redirecting clients to main menu.
+
+    $scope.loadMainMenu = function() {
+      $state.go('main_menu');
+    }
   });
   

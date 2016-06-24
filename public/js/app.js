@@ -18,7 +18,7 @@ config(function ($stateProvider, $urlRouterProvider) {
     state('main_menu', {
       url: '/main_menu',
       templateUrl: 'partials/main_menu.html',
-      controller: 'Controller_MainMenu'
+      controller: 'Controller_MainMenu' // NOTE --> Controller located in controllers_products.js
     }).
     // Client
     state('client_login', {
@@ -40,6 +40,11 @@ config(function ($stateProvider, $urlRouterProvider) {
       url: '/client_register',
       templateUrl: 'partials/client_register.html',
       controller: 'Controller_ClientRegister'
+    }).
+    state('/client_verify', {
+      url: '/client_verify',
+      templateUrl: 'partials/client_verify.html',
+      controller: 'Controller_ClientVerify'
     }).
     // Admin
     state('admin_login', {

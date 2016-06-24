@@ -1,7 +1,6 @@
 Diego To-do:
-	- Verificar funcionamiento de client_register.html
 	- HTML para generar el grid usando ng-repeat y bootstrap -> main_menu.html
-	- Generar vista de producto -> product_detail.html
-	- Pedir ayuda para gráficas -> product_analysis.html
+	- Generar vista de producto -> product_detail.html ==> REYNA
+	- Pedir ayuda para gráficas -> product_analysis.html ==> ALEX
 	- Habilitar 'delete account' en perfil de usuario y para superuser
 	- Terminar detalles visuales con bootstrap

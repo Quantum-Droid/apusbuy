@@ -51,6 +51,16 @@ angular.module('myApp.controllers_admin', []).
     $scope.modifySalesmanStatus = '';
     $scope.deleteSalesmanStatus = '';
 
+    // Logout function
+    $scope.logout = function() {
+      $http.get(route + '/logout')
+      .then(function successCallback(response) {
+        $state.go('main_menu');
+      }, function errorCallback(response) {
+        console.log('Couldn\'t log out.');
+      });
+    }
+
     // Getting the list of salesmen.
     $scope.showSalesmen = function() {
       $http.get(route + '/admins?role=Ventas')
@@ -177,7 +187,9 @@ angular.module('myApp.controllers_admin', []).
       $http.get(route + '/logout')
       .then(function successCallback(response) {
         $state.go('main_menu');
-      })
+      }, function errorCallback(response) {
+        console.log('Couldn\'t log out.');
+      });
     }
 
     /* ********************************************
@@ -187,7 +199,7 @@ angular.module('myApp.controllers_admin', []).
     $scope.addAdminStatus = '';
     $scope.modifyAdminStatus = '';
     $scope.deleteAdminStatus = '';
-    
+
     $scope.addAdmin = function() {
       // POST method that adds a new salesman.
       $http.post(route + '/admin', {

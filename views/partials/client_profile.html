@@ -5,53 +5,60 @@
 	</h3>
 	<p>
 		Aquí podrás ver y editar la información de tu perfil y tus compras.
+		<br/>
+		<button ng-click="logout()" class="btn btn-warning">Cerrar sesión</button>
+		<br/>
 	</p>
 	<p>
-		<h4>Mi perfil</h4>
 		Para editar información, puedes rellenar los campos y hacer clic en 'Guardar cambios'.
-		<form name="client_login_form" novalidate>
-			<!-- Maybe change input to EMAIL? -->
-			Nombre: <br/>
-			<input type="text" name="clientName" ng-model="clientName" class="form-control" />
-			<br/>
-			Apellidos: <br/>
-			<input type="text" name="clientLastName" ng-model="clientLastName" class="form-control" />
-			<br/>
-			Profile picture: <br/>
-			<input type="text" name="clientProfilePicture" ng-model="clientProfilePicture" class="form-control" />
-			<br/>
-			<b>Dirección:</b> <br/><br/>
-			Calle:  <br/>
-			<input type="text" name="clientAddressStreet" ng-model="clientAddressStreet" class="form-control" />
-			<br/>
-			Número: <br/>
-			<input type="text" name="clientAddressNumber" ng-model="clientAddressNumber" class="form-control" />
-			<br/>
-			Código postal: <br/>
-			<input type="text" name="clientAddressPostalCode" ng-model="clientAddressPostalCode" class="form-control" />
-			<br/>
-			Estado: <br/>
-			<input type="text" name="clientAddressState" ng-model="clientAddressState" class="form-control" />
-			<br/>
-			Ciudad: <br/>
-			<input type="text" name="clientAddressCity" ng-model="clientAddressCity" class="form-control" />
-			<br/>
-			Contraseña anterior: <input type="password" name="prev_clientPassword" ng-model="prev_clientPassword" class="form-control" />
-			<br/>
-			Nueva contraseña: <input type="password" name="clientPassword" ng-model="clientPassword" class="form-control" />
-			<br/>
-			Repetir contraseña: <input type="password" name="clientPasswordRepeat" ng-model="clientPasswordRepeat" class="form-control" />
-			<br/>
-		</form>
-		<button ng-click="saveClientChanges()" class="btn btn-success">Guardar cambios</button> {{saveClientChangesStatus}} <br/><br/>
-		Cuenta de correo: {{clientEmail}} <br/>
-		Verificado: {{clientVerified}}
 	</p>
+	<form name="client_login_form" novalidate>
+		<!-- Maybe change input to EMAIL? -->
+		Nombre: <br/>
+		<input type="text" name="clientName" ng-model="clientName" class="form-control" />
+		<br/>
+		Apellidos: <br/>
+		<input type="text" name="clientLastName" ng-model="clientLastName" class="form-control" />
+		<br/>
+		Profile picture: <br/>
+		<input type="text" name="clientProfilePicture" ng-model="clientProfilePicture" class="form-control" />
+		<br/>
+		<b>Dirección:</b> <br/><br/>
+		Calle:  <br/>
+		<input type="text" name="clientAddressStreet" ng-model="clientAddressStreet" class="form-control" />
+		<br/>
+		Número: <br/>
+		<input type="text" name="clientAddressNumber" ng-model="clientAddressNumber" class="form-control" />
+		<br/>
+		Código postal: <br/>
+		<input type="text" name="clientAddressPostalCode" ng-model="clientAddressPostalCode" class="form-control" />
+		<br/>
+		Estado: <br/>
+		<input type="text" name="clientAddressState" ng-model="clientAddressState" class="form-control" />
+		<br/>
+		Ciudad: <br/>
+		<input type="text" name="clientAddressCity" ng-model="clientAddressCity" class="form-control" />
+		<br/>
+		Contraseña anterior: <input type="password" name="prev_clientPassword" ng-model="prev_clientPassword" class="form-control" />
+		<br/>
+		Nueva contraseña: <input type="password" name="clientNewPassword" ng-model="clientNewPassword" class="form-control" />
+		<br/>
+		Repetir contraseña: <input type="password" name="clientNewPasswordRepeat" ng-model="clientNewPasswordRepeat" class="form-control" />
+		<br/>
+	</form>
+	<button ng-click="saveClientChanges()" class="btn btn-success">Guardar cambios</button> {{saveClientChangesStatus}} <br/><br/>
+	Cuenta de correo: {{clientEmail}} <br/>
+	Verificado: {{clientVerified}}
 	<p>
 		<h4>Mis compras</h4>
 		<p>
-			Descuento: {{client}} <br/>
-			<button ng-click="loadShoppingCart()">Mi carrito de compras</button>
+			Descuento: {{clientCartDiscount}} <br/>
+			<button ng-click="loadShoppingCart()" class="btn btn-info">Mi carrito de compras</button>
 		</p>
+	</p>
+	<p>
+		<h4>Borrar cuenta</h4>
+		Eliminar mi cuenta. Esto no se puede deshacer. <br/>
+		<button ng-click="deleteClient()" class="btn btn-danger">Borrar cuenta</button>
 	</p>
 </div>
