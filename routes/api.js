@@ -591,10 +591,10 @@ router.get('/cart', (req,res) =>{
 	var id = req.session.id
 	if(id){
 		id = new ObjectId(id);
-		Client.findOne({_id: id}, (err,client) =>{
-			if(!err && client){				
-				return res.json(client.cart)				
-			}else	return res.json(responseError(CLIENT_NOT_FOUND_ERROR))			
+		Client.findOne({_id: id}).exec((err,client) =>{
+			Client.populate(client,'cart.orders.product', (err,doc) =>{
+				return res.json(doc.cart)
+			})
 		})
 	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));
 });
