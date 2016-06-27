@@ -8,12 +8,13 @@
 	<p>
 		Aquí podrás ver a los empleados registrados como Vendedores, y remover o agregar empleados a la lista.
 		<br/>
-		<button ng-click="logout()">Cerrar sesión</button>
+		<button ng-click="logout()" class="btn btn-default">Cerrar sesión</button>
 		<br/>
 	</p>
 	<p>
 		<h4>Información de los administradores</h4>
-		<button ng-click="showAdmins()">Refrescar</button>
+		<button ng-click="showAdmins()" class="btn btn-default">Refrescar</button>
+		<br/>
 		<table class="table">
 			<tr>
 				<th><a ng-click="filterOptions('name')">Nombre</a></th>
@@ -65,7 +66,8 @@
 				La contraseña es necesaria.
 			</span>
 		</form>
-		<button ng-click="addAdmin(); showAdmins()">Agregar</button> {{addAdminStatus}}
+		<br/>
+		<button ng-click="addAdmin(); showAdmins()" class="btn btn-primary">Agregar</button> {{addAdminStatus}}
 	</p>
 	<p>
 		<h4>Modificar admin</h4>
@@ -79,16 +81,29 @@
 			Rol: <input type="text" name="existing_role" class="form-control" /> <br/>
 			Contraseña: <input type="password" name="existing_password" ng-model="existing_password" class="form-control" /> <br/>
 		</form>
-		<button ng-click="modifyAdmin(); showAdmins()">Modificar</button> {{modifyAdminStatus}}
+		<button ng-click="modifyAdmin(); showAdmins()" class="btn btn-warning">Modificar</button> {{modifyAdminStatus}}
 	</p>
 	<p>
-		<h4>Dar de baja admin</h4>
+		<h4>Dar de baja admin o cliente</h4>
+		<!-- delete Admin -->
 		<form name="deleteAdminForm" novalidate>
-			Email del admin: <input type="text" name="adminEmailToDelete" ng-model="adminEmailToDelete" ng-required="true" class="form-control"/>
+			Admin: <input type="text" name="adminEmailToDelete" ng-model="adminEmailToDelete" ng-required="true" class="form-control"/>
 			<span class="error-message" ng-show="deleteAdminForm.adminEmailToDelete.$dirty && deleteAdminForm.adminEmailToDelete.$error.required">
 				Por favor introduzca el email del admin que desea dar de baja.
 			</span>
 		</form>
+		<br/>
 		<button ng-click="deleteAdmin(); showAdmins()" class="btn btn-danger">Dar de baja</button> {{deleteAdminStatus}}
+		<br/>
+		<br/>
+		<!-- delete Client -->
+		<form name="deleteClientForm" novalidate>
+			Cliente: <input type="text" name="clientEmailToDelete" ng-model="clientEmailToDelete" ng-required="true" class="form-control"/>
+			<span class="error-message" ng-show="deleteClientForm.clientEmailToDelete.$dirty && deleteClientForm.clientEmailToDelete.$error.required">
+				Por favor introduzca el email del cliente que desea dar de baja.
+			</span>
+		</form>
+		<br/>
+		<button ng-click="deleteClient()" class="btn btn-danger">Dar de baja</button> {{deleteClientStatus}}
 	</p>
 </div>

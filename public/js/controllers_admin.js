@@ -42,6 +42,39 @@ angular.module('myApp.controllers_admin', []).
   }).
   controller('Controller_AdminSalesmen', function ($scope, $http, $stateParams, $state) {
     // Web page so Admin Salesman can manage products.
+    $scope.addProductStatus = '';
+
+    // Get all available products.
+    $scope.showProducts = function() {
+      $http.get(route + '/products')
+      .then(function succeedCallbackFunction(response) {
+        $scope.products = response.data;
+      }, function errorCallbackFunction(response) {
+        console.log('Couldn\'t make products petition.');
+      });
+    };
+
+    // Add new product.
+    $scope.addProduct = function() {
+      var categoriesArray = [];
+      var split = $scope.new_categories.split(',');
+      for (var i = 0; i<split.length; i++) {
+        categoriesArray.push(split[i].trim());
+      }
+      // POST method that adds a new salesman.
+      $http.post(route + '/product', {
+        "name":$scope.new_name,
+        "price":$scope.new_price,
+        "categories":categoriesArray
+      })
+      .then(function successCallback(response) {
+        $scope.addProductStatus = "El producto se agregó exitosamente.";
+      }, function errorCallback(response) {
+        $scope.addProductStatus = "Error: el producto no se pudo agregar.";
+      });
+    }
+
+    $scope.showProducts();
 
   }).
   controller('Controller_AdminHR', function ($scope, $http, $stateParams, $state) {
@@ -50,6 +83,16 @@ angular.module('myApp.controllers_admin', []).
     $scope.addSalesmanStatus = '';
     $scope.modifySalesmanStatus = '';
     $scope.deleteSalesmanStatus = '';
+
+    // Logout function
+    $scope.logout = function() {
+      $http.get(route + '/logout')
+      .then(function successCallback(response) {
+        $state.go('main_menu');
+      }, function errorCallback(response) {
+        console.log('Couldn\'t log out.');
+      });
+    }
 
     // Getting the list of salesmen.
     $scope.showSalesmen = function() {
@@ -177,7 +220,9 @@ angular.module('myApp.controllers_admin', []).
       $http.get(route + '/logout')
       .then(function successCallback(response) {
         $state.go('main_menu');
-      })
+      }, function errorCallback(response) {
+        console.log('Couldn\'t log out.');
+      });
     }
 
     /* ********************************************
@@ -187,7 +232,7 @@ angular.module('myApp.controllers_admin', []).
     $scope.addAdminStatus = '';
     $scope.modifyAdminStatus = '';
     $scope.deleteAdminStatus = '';
-    
+
     $scope.addAdmin = function() {
       // POST method that adds a new salesman.
       $http.post(route + '/admin', {
@@ -263,6 +308,22 @@ angular.module('myApp.controllers_admin', []).
       }, function errorCallback(response) {
         console.log('Error while trying to delete admin.');
       });       
+    }
+
+    // Delete client account.
+    $scope.deleteClient = function() {
+      $http.delete(route + '/client?email=' + $scope.clientEmailToDelete)
+      .then(function successCallback(response) {
+        if (!response.data.error) {
+          $scope.deleteClientStatus = 'Cliente dado de baja exitosamente.';
+          console.log('Account deleted.');
+        } else {
+          console.log('Something went wrong!');
+        }
+      }, function errorCallback(response) {
+        $scope.deleteClientStatus = 'No se pudo establecer contacto con el servidor.';
+        console.log('Couldn\'t delete account.');
+      });
     }
     /* ********************************************
                 END OF SUPER USER RIGHTS

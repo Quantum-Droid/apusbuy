@@ -200,6 +200,30 @@ router.get('/logout', (req,res) =>{
 	return res.json(true)
 })
 
+/*
+* Returns the current logged in user (client/admin)
+*/
+router.get('/current', (req,res) =>{
+	var id = req.session.id;
+	var role = req.session.role;
+	if(id){
+		id = new ObjectId(id);
+		if(role){ //admin
+			Admin.findOne({_id: id}, (err, admin) =>{
+				if(!err && admin)
+					return res.json({user: admin, admin: true});
+				else return res.json(null);
+			})
+		}else{//client
+			Client.findOne({_id: id}, (err, client) =>{
+				if(!err && client)
+					return res.json({user: client, admin: false})
+				else return res.json(null);
+			})
+		}
+	}else return res.json(null);
+})
+
 //admin login send email and password in the body
 router.post('/adminLogin', (req, res) => {
 	Admin.findOne(
@@ -686,3 +710,26 @@ router.post('/checkout', (req,res) =>{
 		});		
 	}else return res.json(SESSION_NOT_FOUND_ERROR);
 });
+
+/*************** INVENTORY SECTION *******************/
+
+/*
+* Returns the ammount of a product
+* available in the inventory
+*/
+router.get('/inventory', (req,res) =>{
+	var id = req.query._id;
+	if(id){
+		id = new ObjectId(id);
+		Inventory.findOne((err,inventory) =>{
+			if(!err && inventory){
+				var ammount = -1;
+				inventory.items.forEach((item) =>{
+					if(item.product.toString() === id.toString())
+						ammount = item.ammount
+				})
+				return res.json(ammount)
+			}else return res.json(null);
+		})
+	}else return res.json(null);
+})

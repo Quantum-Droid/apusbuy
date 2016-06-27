@@ -1,0 +1,6 @@
+Diego To-do:
+	- Generar vista de producto -> product_detail.html ==> REYNA
+	- Pedir ayuda para gráficas -> product_analysis.html ==> ALEX
+	- Habilitar 'delete account' en perfil de usuario y para superuser
+	- Agregar habilidades para admin de ventas
+	- Terminar detalles visuales con bootstrap
