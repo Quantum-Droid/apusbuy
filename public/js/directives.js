@@ -14,8 +14,7 @@ angular.module('myApp').directive('gridDirective', function() {
 		restrict: 'AEC',
 		replace: true,
 		templateUrl: 'partials/main_menu_grid.html',
-		link: function(scope, elem, attrs) {
-			console.log('Directive called.');
+		link: function(scope, elem, attrs) {			
 		}
 	}
 });
@@ -23,13 +22,18 @@ angular.module('myApp').directive('gridDirective', function() {
 angular.module('myApp.directives', []).
 	directive('ngIf', function() {
     return {
-      link: function(scope, element, attrs) {
-        if(scope.$eval(attrs.ngIf)) {
+      link: function(scope, element, attrs) {        
+        scope.currentUser().then((data) =>{
+          scope.client = data.user;
+          scope.isAdmin = data.admin;          
+          if(scope.$eval(attrs.ngIf)) {
             // remove '<div ng-if...></div>'
+            scope = $              
             element.replaceWith(element.children())
-        } else {
-            element.replaceWith(' ')
-        }
+          } else {
+              element.replaceWith(' ')
+          }
+        })                
       }
     }
 });

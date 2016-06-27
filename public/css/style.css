@@ -7,11 +7,13 @@ div.grid {
 	padding: 30px 30px 30px 30px;
 	background-color: LightCyan;
 }
+
 img.grid {
 	/* Grid style for images. */
 	max-width: 60%;
 	height: auto;
 }
+
 body {
   padding-top: 50px;
 }
@@ -20,12 +22,60 @@ body {
   text-align: center;
 }
 .bottom{
-  border-bottom: 1px solid red;
-  margin-bottom: 5%;
+  border-bottom: 1px solid #757070;
+  margin-bottom: 2%;
 }
-.img{  
-  margin-right: 1%;
+
+.img{    
+  vertical-align: middle;  
 }
+
 .name{	
+	margin-top: 2em;
 	text-align: center;
+}
+
+.price{
+	padding-bottom: 1em;
+}
+
+.price h3{
+	display: inline;
+}
+
+.price p{
+	display: inline;
+	font-size: 1.5em;		
+}
+
+.available{
+	color: #00b300;
+	font-size: 2em;	
+}
+
+.unavailable{
+	color: red;
+	font-size: 2em;	
+}
+
+.cart_section{
+	align-items: center;
+	align-content: center;
+	text-align: center;
+	border-color: #757070;
+	border-width: 1.2px;
+	border-style: solid;
+	border-radius: 15px;
+}
+
+.box-content{
+	margin: 1em;
+}
+
+.address-section{
+	text-align: left;
+}
+
+textarea {
+   resize: none;
 }

@@ -1,21 +1,21 @@
 [
   {
     "name": "Laptop Dell",
-    "description": "Latop muy cool",
+    "description": "Lorem ipsum dolor sit amet, eu oratio iisque vel. Epicuri ullamcorper pro no, mei at possit possim, te prima viris postulant est. Mei at appellantur delicatissimi, at vix corrumpit maiestatis eloquentiam. Mei ut exerci reprimique, qui amet dicta cu. Sit error tantas ubique an, te zril indoctum mel.Solet efficiendi persequeris pri ex, te fabulas sapientem reprimique mel. Fugit nostrud per id, ea putant tacimates delicatissimi cum. Suas verear electram sit ne, his in esse aliquip, lorem cotidieque in his. Nec dicta tollit an, brute novum altera has at. Tale vide blandit an his, expetenda urbanitas similique an qui.",
     "price": 3500,
     "image": "http://ecx.images-amazon.com/images/I/71lyBaN-vAL._SL1500_.jpg",
     "categories": ["Electronicos", "Cómputo", "Gadgets"]
   },
   {
     "name": "Audifonos Bose",
-    "description": "Audifonos muy cool",
+    "description": "Lorem ipsum dolor sit amet, eu oratio iisque vel. Epicuri ullamcorper pro no, mei at possit possim, te prima viris postulant est. Mei at appellantur delicatissimi, at vix corrumpit maiestatis eloquentiam. Mei ut exerci reprimique, qui amet dicta cu. Sit error tantas ubique an, te zril indoctum mel.Solet efficiendi persequeris pri ex, te fabulas sapientem reprimique mel. Fugit nostrud per id, ea putant tacimates delicatissimi cum. Suas verear electram sit ne, his in esse aliquip, lorem cotidieque in his. Nec dicta tollit an, brute novum altera has at. Tale vide blandit an his, expetenda urbanitas similique an qui.",
     "price": 760.99,
     "image": "http://ecx.images-amazon.com/images/I/71lyBaN-vAL._SL1500_.jpg",
     "categories": ["Electronicos", "Audio", "Gadgets"]
   },
   {
     "name": "Funda iPhone 6S",
-    "description": "Funda muy cool",
+    "description": "Lorem ipsum dolor sit amet, eu oratio iisque vel. Epicuri ullamcorper pro no, mei at possit possim, te prima viris postulant est. Mei at appellantur delicatissimi, at vix corrumpit maiestatis eloquentiam. Mei ut exerci reprimique, qui amet dicta cu. Sit error tantas ubique an, te zril indoctum mel.Solet efficiendi persequeris pri ex, te fabulas sapientem reprimique mel. Fugit nostrud per id, ea putant tacimates delicatissimi cum. Suas verear electram sit ne, his in esse aliquip, lorem cotidieque in his. Nec dicta tollit an, brute novum altera has at. Tale vide blandit an his, expetenda urbanitas similique an qui.",
     "price": 200,
     "image": "http://applesencia.com/files/2014/09/iphone-6-funda-spigen-tough-armor.jpg",
     "categories": ["Accsesorio", "Gadgets"]
