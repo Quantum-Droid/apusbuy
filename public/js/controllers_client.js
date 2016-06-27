@@ -137,8 +137,15 @@ angular.module('myApp.controllers_client', []).
       }
     }
   }).
-  controller('Controller_ClientShoppingCart', function ($scope) {
-    // write Ctrl here
+  controller('Controller_ClientShoppingCart', function ($scope, authenticationService, $http) {
+    $scope.currentUser = function(){
+      return authenticationService.currentUser();
+    }
+    
+    $scope.currentUser().then((data) =>{
+      $scope.client = data.user      
+      $scope.isAdmin = data.admin;      
+    })    
 
   }).
   controller('Controller_ClientVerify', function ($scope, $state) {
