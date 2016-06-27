@@ -3,4 +3,5 @@ Diego To-do:
 	- Pedir ayuda para gráficas -> product_analysis.html ==> ALEX
 	- Habilitar 'delete account' en perfil de usuario y para superuser
 	- Agregar habilidades para admin de ventas
-	- Terminar detalles visuales con bootstrap
+	- Terminar detalles visuales con bootstrapA
+	- Fecha de nacimiento en Client Register
