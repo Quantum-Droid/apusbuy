@@ -147,6 +147,7 @@ router.post('/register', (req, res) => {
 	var client = new Client();
   client.name = req.body.name;
   client.lastName = req.body.lastName;
+	client.birthdate = req.body.birthdate;
   client.email = req.body.email;
   client.passwordDigest = req.body.password;
   client.verified = false;
@@ -282,6 +283,7 @@ router.put('/client', (req, res) => {
 		if(!err && client){		
 			client.name = req.body.name ? req.body.name : client.name;
 			client.lastName = req.body.lastName ? req.body.lastName : client.lastName;
+			client.birthdate = req.body.birthdate ? req.body.birthdate : client.birthdate;
 			client.password = req.body.password ? req.body.password : client.password;
 			client.address.street = req.body.street ? req.body.street : client.address.street;
 			client.address.postalCode = req.body.postalCode ? req.body.postalCode : client.address.postalCode;
