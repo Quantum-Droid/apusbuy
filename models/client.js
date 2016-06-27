@@ -6,6 +6,7 @@ var ObjectId = mongoose.Schema.Types.ObjectId;
 var clientSchema = mongoose.Schema({
 	name: String,
 	lastName: String,
+	birthdate: String,
 	email: String,
 	verified: Boolean,
 	password: String,

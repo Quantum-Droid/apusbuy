@@ -51,7 +51,8 @@ function sendVerification(id, email){
 	var mailOptions = {
 		to: email,
 		subject: 'Verify your account',
-		text: 'Hello there we are glad you had joined Apusbuy. Now before you can start buying with your account just write this code:'+ id +' on your profile so we can verify this is your email.'
+		html: '<a href=http://localhost:3000/api/verify?code='+id+'>Click to verify your account.</a>'
+
 	};
 	transporter.sendMail(mailOptions, function(err, info){
 		if(!err){
@@ -109,15 +110,25 @@ function canModify(modifier, modified) {
 
 /*************** LOGIN / REGISTER SECTION **************/
 //send id written by the user in the body
-router.put('/verify',(req, res) => {
-	Client.findOne({_id: new ObjectId(req.query._id)},
+router.get('/verify',(req, res) => {
+	Client.findOne({_id: new ObjectId(req.query.code)},
 	(err, client) => {
-		if(!err && client){	
-			client.verified = true;		
+		if(!err && client){
+			client.name = client.name;
+			client.lastName = client.lastName;
+			client.birthdate = client.birthdate;
+			client.email = client.email;
+			client.verified = true;
+			client.password = client.password;
+			client.address = client.address;
+			client.cards = client.cards;
+			client.cart = client.cart;
+			client.boughtItems = client.bought
 			client.save((err, obj) => {
 				if (!err) {
-					console.log(obj.name + ' saved.');  		
-					return res.json(obj);
+					console.log(obj.name + ' saved.');
+					res.redirect('/')
+					//return res.json(obj);
 				}  	
   		});
 		}else return res.json(responseError(CLIENT_NOT_FOUND_ERROR));
@@ -137,6 +148,7 @@ router.post('/register', (req, res) => {
 	var client = new Client();
   client.name = req.body.name;
   client.lastName = req.body.lastName;
+	client.birthdate = req.body.birthdate;
   client.email = req.body.email;
   client.passwordDigest = req.body.password;
   client.verified = false;
@@ -151,15 +163,27 @@ router.post('/register', (req, res) => {
   	if (!err && obj) {
   		console.log(obj.name + ' saved.');
   		sendVerification(obj._id, obj.email);
-  		return res.json(obj);
+  		res.redirect('/api/clientLogin?_id='+obj._id);
   	}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR))
   }); 
 });
 
 //client login send emal and password in the body
+router.get('/clientLogin', (req, res) => {
+	var id = new ObjectId(req.query._id);
+	Client.findOne({_id: id}, (err, client) => {
+		if(!err && client){
+			console.log('found.');
+			req.session.id = client._id;
+			console.log(req.session.id);
+			return res.json(client);
+		}else return res.json(responseError(CLIENT_NOT_FOUND_ERROR))
+	});
+});
+
 router.post('/clientLogin', (req, res) => {
 	Client.findOne(
-		{email: req.body.email, 
+		{email: req.param('email'), 
 		password: req.body.password}, 
 	(err, client) => {
 		if(!err && client){
@@ -260,6 +284,7 @@ router.put('/client', (req, res) => {
 		if(!err && client){		
 			client.name = req.body.name ? req.body.name : client.name;
 			client.lastName = req.body.lastName ? req.body.lastName : client.lastName;
+			client.birthdate = req.body.birthdate ? req.body.birthdate : client.birthdate;
 			client.password = req.body.password ? req.body.password : client.password;
 			client.address.street = req.body.street ? req.body.street : client.address.street;
 			client.address.postalCode = req.body.postalCode ? req.body.postalCode : client.address.postalCode;
@@ -267,7 +292,9 @@ router.put('/client', (req, res) => {
 			client.address.state = req.body.state ? req.body.state : client.address.state;
 			client.address.city = req.body.city ? req.body.city : client.address.city;
 			client.cards = req.body.cards ?req.body.cards : client.cards;
-		
+			client.cart = client.cart;
+			client.boughtItems = client.boughtItems;
+
 			if(client.email !== req.body.email){
 				client.verified = false;
 				client.email = req.body.email;
