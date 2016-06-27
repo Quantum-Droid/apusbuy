@@ -1,1 +1,39 @@
-product_details.html
+<div class="container">
+    <div class="row bottom">
+        <div class = "row bottom">
+        	<div class="name col-sm-12">
+	        	<h1>Detalles de {{product.name}}</h1>
+	        </div>        	
+        </div>
+
+        <div class="img-rounded col-sm-4 img img-responsive" >
+        	<img ng-src="{{product.image}}" alt="thumbnail" width="100%" height="100%">
+        </div>
+
+        <div class="details col-sm-8 col-md-5">        		
+					  <div class="description bottom">
+					  	<h3>Descripción</h3>
+					  	<p>{{product.description}}</p>
+					  </div>	
+					  <div class="price">        			
+        				<h3>Precio:</h3> <p>${{product.price}}</p>
+        		</div>
+        		<div class="inventory" ng-switch on="available_ammount">        			
+        			<span class="unavailable" ng-switch-when="0">Producto no disponible :(</span>
+        			<span class="available" ng-switch-default>Disponible</span>
+        		</div>
+        	
+        </div>
+        <div class="cart_section col-md-3" ng-if="loggedIn()">        	
+        		    	
+        </div>
+    </div>
+    <!-- NOT SUPPORTED. MAY NEVER BE SUPPORTED -->
+    <div class="row reviews">
+        <div class="col-md-offset-2 col-md-8">
+        	<!-- reviews -->
+        	<h2>Reseñas</h2>
+        	<p></p>
+        </div>
+    </div>
+</div>

@@ -662,3 +662,26 @@ router.post('/checkout', (req,res) =>{
 		});		
 	}else return res.json(SESSION_NOT_FOUND_ERROR);
 });
+
+/*************** INVENTORY SECTION *******************/
+
+/*
+* Returns the ammount of a product
+* available in the inventory
+*/
+router.get('/inventory', (req,res) =>{
+	var id = req.query._id;
+	if(id){
+		id = new ObjectId(id);
+		Inventory.findOne((err,inventory) =>{
+			if(!err && inventory){
+				var ammount = -1;
+				inventory.items.forEach((item) =>{
+					if(item.product.toString() === id.toString())
+						ammount = item.ammount
+				})
+				return res.json(ammount)
+			}else return res.json(null);
+		})
+	}else return res.json(null);
+})
