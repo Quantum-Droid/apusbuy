@@ -32,7 +32,7 @@ angular.module('myApp.controllers_product', []).
       });
     };
 
-    $scope .getProducts();
+    $scope.getProducts();
 
   }).
   controller('Controller_ProductDetail', function ($scope) {
