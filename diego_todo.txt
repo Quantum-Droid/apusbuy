@@ -4,4 +4,4 @@ Diego To-do:
 	- Habilitar 'delete account' en perfil de usuario y para superuser
 	- Agregar habilidades para admin de ventas
 	- Terminar detalles visuales con bootstrapA
-	- Fecha de nacimiento en Client Register
+	- Fecha de nacimiento en Client Register 'birthdate'

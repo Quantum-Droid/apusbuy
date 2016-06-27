@@ -5,12 +5,13 @@ div.grid {
 	border-color: DarkSlateGrey;
 	border-radius: 5px;
 	padding: 30px 30px 30px 30px;
-	background-color: LightCyan;
+	background-color: White;
 }
 
 img.grid {
 	/* Grid style for images. */
-	max-width: 60%;
+	max-width: 100%;
+	height: auto;
 	height: auto;
 }
 
