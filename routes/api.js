@@ -116,6 +116,7 @@ router.get('/verify',(req, res) => {
 		if(!err && client){
 			client.name = client.name;
 			client.lastName = client.lastName;
+			client.birthdate = client.birthdate;
 			client.email = client.email;
 			client.verified = true;
 			client.password = client.password;
