@@ -178,6 +178,30 @@ router.get('/logout', (req,res) =>{
 	return res.json(true)
 })
 
+/*
+* Returns the current logged in user (client/admin)
+*/
+router.get('/current', (req,res) =>{
+	var id = req.session.id;
+	var role = req.session.role;
+	if(id){
+		id = new ObjectId(id);
+		if(role){ //admin
+			Admin.findOne({_id: id}, (err, admin) =>{
+				if(!err && admin)
+					return res.json({user: admin, admin: true});
+				else return res.json(null);
+			})
+		}else{//client
+			Client.findOne({_id: id}, (err, client) =>{
+				if(!err && client)
+					return res.json({user: client, admin: false})
+				else return res.json(null);
+			})
+		}
+	}else return res.json(null);
+})
+
 //admin login send email and password in the body
 router.post('/adminLogin', (req, res) => {
 	Admin.findOne(

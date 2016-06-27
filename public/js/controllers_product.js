@@ -7,23 +7,47 @@ var route = "http://localhost:3000/api";
 angular.module('myApp.controllers_product', []).
   controller('Controller_MainMenu', function ($scope, $http, $state, $stateParams, networkService) {
   	// Controller that is used for displaying the available items when on the main page.
-  	$scope.products = null;
-    networkService.fetchProducts().then((response) =>{
-        $scope.products = response.data;
-    })
 
+    // Method to get all available products.
+    $scope.getProducts = function() {
+      $http.get(route + '/products')
+      .then(function succeedCallbackFunction(response) {
+        $scope.rows = response.data;
+        // To order by groups of 3.
+        var arrays = [], size = 3;
+        while ($scope.rows.length > 0) {
+          arrays.push($scope.rows.splice(0, size));
+        }        
+        $scope.rows = arrays;
+      }, function errorCallbackFunction(response) {
+        console.log('Couldn\'t make products petition.');
+      });
+    };
+
+    // Method to view one specific product's details.
+    $scope.loadProductDetails = function() {
+      $state.go('product_details', {
+        product_id: $scope.product_id
+      });
+    };
+
+    $scope.getProducts();
 
   }).
   controller('Controller_ProductDetail', function ($scope, $stateParams, networkService, $http, inventoryService, authenticationService) {
-    $scope.product = null;
+    $scope.product = null;    
     var id = $stateParams.product_id;
+    $scope.selectedQuantity = 1;
 
-    //Client info
-    $scope.client = null;
-    authenticationService.client().then((response) =>{
-      $scope.client = response.data;
+    $scope.currentUser = function(){
+      return authenticationService.currentUser();
+    }
+    
+    $scope.currentUser().then((data) =>{
+      $scope.client = data.user      
+      $scope.isAdmin = data.admin;
+      console.log(data)
     })
-
 
     //Get product info
     networkService.fetchProduct(id).then((response) =>{
@@ -36,8 +60,47 @@ angular.module('myApp.controllers_product', []).
       $scope.available_ammount = response.data;
     })
 
-    $scope.loggedIn = function(){      
-      return $scope.client
+    /*
+    * Adds the product to the client's cart
+    */
+    $scope.addItem = function(){      
+      $http.put(route + '/cart', {
+        product: id,
+        ammount: $scope.selectedQuantity,
+        action: "add"
+      }).success((res) =>{
+        console.log('success')
+        console.log(res)
+      }).error((err) =>{
+        console.log('error')
+        console.log(err)
+      })
+    }
+
+    //Updates the product's info
+    $scope.updateProduct = function(){
+      console.log('Updating');
+      $http.put(route + '/product?_id=' + id, {
+        description: $scope.product.description,
+        image: $scope.product.image,
+        price: $scope.product.price
+      }).success((res) =>{
+        console.log(res);
+      }).error((res) =>{
+        console.log('Error :(')
+        console.log(res)
+      })
+    }
+
+    //Removes the product from the DB
+    $scope.deleteProduct = function(){
+      console.log('Deleting')
+      $http.delete(route + '/product?_id=' + id)
+        .success((res) =>{
+          console.log(res);
+        }).error((res) =>{
+          console.log(res);
+        })
     }
 
 

@@ -43,7 +43,7 @@ angular.module('myApp.services').service('networkService', function($http){
 
 })
 
-angular.module('myApp.services').service('authenticationService', function($http){
+angular.module('myApp.services').service('authenticationService', function($http, $q){
 	/*
 	* Returns the current logged in client
 	*/
@@ -58,18 +58,17 @@ angular.module('myApp.services').service('authenticationService', function($http
 			})
 	}
 
-		/*
-	* Returns the current logged in admin
-	*/
-	this.admin = function(){
-		var endpoint = route + '/admin';
-		return $http.get(endpoint)
-			.success((admin) =>{
-				return admin;
+	this.currentUser = function(){
+		var deferred = $q.defer();
+		var endpoint = route + '/current';
+		$http.get(endpoint)
+			.success((data) =>{
+				deferred.resolve(data);
 			})
 			.error(() =>{
-				return null;
-			})
+				deferred.reject("fek, it's wrong");
+			});
+		return deferred.promise;
 	}
 })
 
