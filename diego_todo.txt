@@ -1,7 +1,9 @@
 Diego To-do:
 	- Generar vista de producto -> product_detail.html ==> REYNA
 	- Pedir ayuda para gráficas -> product_analysis.html ==> ALEX
-	- Habilitar 'delete account' en perfil de usuario y para superuser
 	- Agregar habilidades para admin de ventas
 	- Terminar detalles visuales con bootstrapA
 	- Fecha de nacimiento en Client Register 'birthdate'
+	- Logout bonito
+	- Mejorar grid en main menu
+	- Link de imagen en registrar producto
