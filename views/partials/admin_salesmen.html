@@ -1,1 +1,51 @@
-admin_salesmen.html
+<div class="container">
+	<!-- Template for Salesmen to view, add, modify and delete items for selling. -->
+	<p>
+		<h3>
+			Productistrador de ventas
+		</h3>	
+	</p>
+	<p>
+		Aquí podrás agregar, editar y eliminar productos que se venderán en Apu's Buy.
+		<br/>
+		<br/>
+		<button ng-click="logout()" class="btn btn-default">Cerrar sesión</button>
+		<br/>
+	</p>
+	<p>
+		<h4>Información de los productos</h4>
+		<button ng-click="showProducts()" class="btn btn-default">Refrescar</button>
+		<br/>
+		<br/>
+		<table class="table">
+			<tr>
+				<th><a ng-click="filterOptions('name')">Nombre</a></th>
+				<th><a ng-click="filterOptions('price')">Precio</a></th>
+				<th><a ng-click="filterOptions('categories')">Categorías</a></th>
+			</tr>
+			<tr ng-repeat="product in products | orderBy: filterOption">
+				<td><a ng-click="loadProductDetails()">{{product.name}}</a></td>	
+				<td>{{product.price}}</td>
+				<td>{{product.categories}}</td>
+			</tr>
+		</table>
+	</p>
+	<p>
+		<h4>Agregar producto</h4>
+		<form name="addProductForm" novalidate>
+			Nombre: <input type="text" name="new_name" ng-model="new_name" ng-required="true" class="form-control" />
+			<span class="error-message" ng-show="addProductForm.new_name.$dirty && addProductForm.new_name.$error.required">
+				El nombre es necesario.
+			</span> <br/>
+			Precio: <input type="text" name="new_price" ng-model="new_price" ng-required="true" class="form-control" />
+			<span class="error-message" ng-show="addProductForm.new_price.$dirty && addProductForm.new_price.$error.required">
+				El precio es necesario.
+			</span> <br/>
+			Categorías (separadas por comas): <input type="text" name="new_categories" ng-model="new_categories" ng-required="true" class="form-control" />
+			<span class="error-message" ng-show="addProductForm.new_categories.$dirty && addProductForm.new_categories.$error.required">
+				Las categorías (o categoría) son necesarias.
+			</span> <br/>
+		</form>
+		<button ng-click="addProduct(); showProducts()" class="btn btn-primary">Agregar</button> {{addProductStatus}}
+	</p>
+</div>

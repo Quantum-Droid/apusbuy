@@ -1,7 +1,26 @@
+div.grid {
+	/* Grid style for home page product display. */
+	border-style: solid;
+	border-width: 1px;
+	border-color: DarkSlateGrey;
+	border-radius: 5px;
+	padding: 30px 30px 30px 30px;
+	background-color: LightCyan;
+}
 body {
   padding-top: 50px;
 }
 .starter-template {
   padding: 40px 15px;
   text-align: center;
+}
+.bottom{
+  border-bottom: 1px solid red;
+  margin-bottom: 5%;
+}
+.img{  
+  margin-right: 1%;
+}
+.name{	
+	text-align: center;
 }
