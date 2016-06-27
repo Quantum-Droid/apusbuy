@@ -34,10 +34,14 @@ angular.module('myApp.controllers_product', []).
     $scope.getProducts();
 
   }).
-  controller('Controller_ProductDetail', function ($scope, $stateParams, networkService, $http, inventoryService, authenticationService) {
+  controller('Controller_ProductDetail', function ($state, $scope, $stateParams, networkService, $http, inventoryService, authenticationService) {
+    // Controller used for showing, modifying and deleting a product.
+
     $scope.product = null;    
     var id = $stateParams.product_id;
     $scope.selectedQuantity = 1;
+
+
 
     $scope.currentUser = function(){
       return authenticationService.currentUser();
@@ -60,9 +64,7 @@ angular.module('myApp.controllers_product', []).
       $scope.available_ammount = response.data;
     })
 
-    /*
-    * Adds the product to the client's cart
-    */
+    //Adds the product to the client's cart
     $scope.addItem = function(){      
       $http.put(route + '/cart', {
         product: id,
@@ -74,7 +76,7 @@ angular.module('myApp.controllers_product', []).
       }).error((err) =>{
         console.log('error')
         console.log(err)
-      })
+      });
     }
 
     //Updates the product's info
@@ -89,7 +91,7 @@ angular.module('myApp.controllers_product', []).
       }).error((res) =>{
         console.log('Error :(')
         console.log(res)
-      })
+      });
     }
 
     //Removes the product from the DB
@@ -100,9 +102,14 @@ angular.module('myApp.controllers_product', []).
           console.log(res);
         }).error((res) =>{
           console.log(res);
-        })
+        });
     }
 
+    // Loads client login page.
+    $scope.loadClientLogin = function() {
+      console.log('Going to client login');
+      $state.go('client_login');
+    }
 
   }).
   controller('Controller_ProductAnalysis', function ($scope) {
