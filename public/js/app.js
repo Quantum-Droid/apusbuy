@@ -9,7 +9,8 @@ angular.module('myApp', [
   'myApp.filters',
   'myApp.services',
   'myApp.directives',
-  'ui.router'
+  'ui.router',
+	'chart.js'
 ]).
 config(function ($stateProvider, $urlRouterProvider) {
   // States
