@@ -14,18 +14,19 @@ angular.module('myApp.controllers_product', []).
       .then(function succeedCallbackFunction(response) {
         $scope.rows = response.data;
         // To order by groups of 3.
-        var arrays = [], size = 3;
-        while ($scope.rows.length > 0) {
-          arrays.push($scope.rows.splice(0, size));
-        }        
-        $scope.rows = arrays;
+        //var arrays = [], size = 3;
+        //while ($scope.rows.length > 0) {
+        //  arrays.push($scope.rows.splice(0, size));
+        //}        
+        //$scope.rows = arrays;
       }, function errorCallbackFunction(response) {
         console.log('Couldn\'t make products petition.');
       });
     };
 
     // Method to view one specific product's details.
-    $scope.loadProductDetails = function() {
+    $scope.loadProductDetails = function(product_id) {
+      $scope.product_id = product_id;
       $state.go('product_details', {
         product_id: $scope.product_id
       });
@@ -34,7 +35,7 @@ angular.module('myApp.controllers_product', []).
     $scope.getProducts();
 
   }).
-  controller('Controller_ProductDetail', function ($state, $scope, $stateParams, networkService, $http, inventoryService, authenticationService) {
+  controller('Controller_ProductDetails', function ($state, $scope, $stateParams, networkService, $http, inventoryService, authenticationService) {
     // Controller used for showing, modifying and deleting a product.
 
     $scope.product = null;    
@@ -50,7 +51,7 @@ angular.module('myApp.controllers_product', []).
     $scope.currentUser().then((data) =>{
       $scope.client = data.user      
       $scope.isAdmin = data.admin;
-      console.log(data)
+      //console.log(data)
     })
 
     //Get product info

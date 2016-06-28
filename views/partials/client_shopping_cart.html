@@ -1,1 +1,93 @@
-user_shopping_cart.html
+<div class="container">
+		<!-- Client WITH session -->
+    <div class="row cart box-content" ng-show="client && !isAdmin">
+        <!--Cart orders-->
+        <div class="orders bottom col-xs-12">
+          <div class="box-content">
+            <h2>Mi Carrito</h2>                          
+          </div>
+          <!-- Cart content. Displayed when cart has something -->
+          <div class="table-responsive" ng-show="cart.orders.length">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th style="width:25%;"></th>
+                  <th>Producto</th>
+                  <th>Precio c/u</th>
+                  <th>Cantidad</th>
+                  <th>Total</th>                  
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="sucess" ng-repeat="order in cart.orders">
+                  <td>
+                    <img ng-src="{{order.product.image}}" alt="thumbnail" width="70%" height="auto">
+                  </td>
+                  <td>{{order.product.name}}</td>
+                  <td>{{order.product.price}}</td>
+                  <td>{{order.ammount}}</td>
+                  <td>{{order.ammount * order.product.price}}</td>
+                </tr>
+              </tbody>
+            </table>
+            </div>
+          <div ng-hide="cart.orders.length" >
+            <img class="img-responsive" ng-src="http://foreverdiamonds.co.in/images/emptycart.jpg" >
+          </div>
+        </div>
+
+        <!-- Available payments -->
+        <div class="payment col-sm-6" style="text-align: center;">
+          <h2>Forma de pago</h2>
+          <!-- Show cards if user has cards -->
+          <div ng-show="client.cards.length">
+            <label class="radio" ng-repeat="card in client.cards">
+              <img ng-src="{{randomCardImage()}}" width="10%" height="auto">
+              <br>    
+              <input type="radio" name="optradio">{{secureCard(card)}}
+            </label>
+          </div>
+          <!-- Ask to update profile if no cards -->
+          <div ng-hide="client.cards.length">
+            <p> No has especificado ninguna tarjeta de crédito </p>
+            <a ng-click="goToUpdate()" class="btn btn-info box-content">
+              <span class="glyphicon glyphicon-credit-card"></span> Agregar tarjeta
+            </a>
+          </div>
+        </div>
+        <!-- Shipping Address Exists; Display Address-->
+        <div class="address col-sm-6" ng-show="client.address">
+          <h3>Dirección de envío:</h3>
+            <p><strong>Calle: </strong>{{client.address.street}}</p>
+            <p><strong>C.P: </strong>{{client.address.postalCode}}</p>
+            <p><strong>Ciudad: </strong>{{client.address.city}}</p>
+            <p><strong>Estado: </strong>{{client.address.state}}</p>
+        </div>
+        <!-- Shipping address: ask to update if no address -->
+        <div class="address col-sm-6" ng-hide="client.address">
+          <h3>Dirección de envío:</h3>
+          <p> No has especificado tu dirección de entrega </p>
+          <a ng-click="goToUpdate()" class="btn btn-info box-content">
+            <span class="glyphicon glyphicon-pencil"></span> Actualiza tu perfil
+          </a>
+        </div>
+        <!-- Finalizar compra -->
+        <div class="buy col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6" style="text-align: center;">
+          <a ng-click="checkout()" 
+          class="btn btn-success btn-lg box-content" 
+          ng-class="{disabled: !cart.orders.length}"
+          ng-class="{active: cart.orders.length}">
+            <span class="glyphicon glyphicon-shopping-cart"></span> COMPRAR
+          </a>
+        </div>
+    </div>
+    <!-- Client WITHOUT session -->
+    <div class="row" ng-show="!client">
+    	<div class="col-xs-12">
+    		<p>Debes iniciar sesión para poder comprar</p>
+	  		<a class="btn btn-info btn-lg box-content" ng-click="goToLogin()">
+		      <span class="glyphicon glyphicon-log-in"></span> Log in
+		    </a>
+    	</div>
+    </div>	
+</div>

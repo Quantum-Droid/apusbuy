@@ -1,20 +1,21 @@
 div.grid {
 	/* Grid style for home page product display. */
+	/*
 	border-style: solid;
 	border-width: 1px;
 	border-color: DarkSlateGrey;
 	border-radius: 5px;
+	*/
 	padding: 30px 30px 30px 30px;
 	background-color: White;
+	text-align: center;
 }
-
 img.grid {
-	/* Grid style for images. */
+	height: 200px;
 	max-width: 100%;
-	height: auto;
-	height: auto;
+	width: auto;
+	text-align: center;
 }
-
 body {
   padding-top: 50px;
 }

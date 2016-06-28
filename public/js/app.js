@@ -74,10 +74,10 @@ config(function ($stateProvider, $urlRouterProvider) {
       templateUrl: 'partials/product_analysis.html',
       controller: 'Controller_ProductAnalysis'
     }).
-    state('product_detail', {
-      url: '/product_detail/:product_id',
-      templateUrl: 'partials/product_detail.html',
-      controller: 'Controller_ProductDetail'
+    state('product_details', {
+      url: '/product_details/:product_id',
+      templateUrl: 'partials/product_details.html',
+      controller: 'Controller_ProductDetails'
     })
 
     // For unmatched states

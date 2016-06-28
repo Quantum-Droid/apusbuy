@@ -137,13 +137,65 @@ angular.module('myApp.controllers_client', []).
       }
     }
   }).
-  controller('Controller_ClientShoppingCart', function ($scope) {
-    // write Ctrl here
+  controller('Controller_ClientShoppingCart', function ($scope, authenticationService, $http, networkService, $state) {
+
+    const visaUrl = "http://icons.iconarchive.com/icons/designbolts/credit-card-payment/256/Visa-icon.png";
+    const masterCardUrl = "http://icons.iconarchive.com/icons/designbolts/credit-card-payment/256/Master-Card-icon.png"
+    const americanExpressUrl = "http://icons.iconarchive.com/icons/designbolts/credit-card-payment/256/American-Express-icon.png";
+    const cardThumbs = [visaUrl, masterCardUrl, americanExpressUrl];
+
+    $scope.currentUser = function(){
+      return authenticationService.currentUser();
+    }
+    //get current user. May be client or admin
+    $scope.currentUser().then((data) =>{
+      $scope.client = data.user      
+      $scope.isAdmin = data.admin;      
+    })
+
+    //get client's cart
+    networkService.fetchCart().then((response) =>{
+      if(response.status === 200)
+        $scope.cart = response.data;
+    })
+
+    /*
+    * Turns the credit card number from 
+    * 1234567890123456 to ****3456
+    */
+    $scope.secureCard = function(card){
+      return "****" + card.number.slice(12,16)
+    }
+
+    //Gets a random credit card image
+    $scope.randomCardImage = function(){
+      // var r = Math.floor(Math.random() * (3 - 0 + 1)) + 0;      
+      return cardThumbs[2];
+    }
+    //Redirects to client profile
+    $scope.goToUpdate = function(){
+      $state.go('client_profile');
+    }
+    //Redirects to login
+    $scope.goToLogin = function(){
+      $state.go('client_login');
+    }
+
+    //Performs a checkout of the client's products
+    $scope.checkout = function(){
+      $http.post(route + '/checkout', {})
+        .success((ans) =>{
+          console.log(ans)
+        })
+        .error((err) =>{
+          console.log(err)
+        })
+    }
+
 
   }).
   controller('Controller_ClientVerify', function ($scope, $state) {
     // For redirecting clients to main menu.
-
     $scope.loadMainMenu = function() {
       $state.go('main_menu');
     }
