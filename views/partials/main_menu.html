@@ -1,7 +1,11 @@
 <div class="container">
 	<!-- Template for main menu. It should display some of the products in inventory. -->
-	<h2 style="align-content: center;">Apu's Buy</h2>
-	<div class="container" ng-repeat="rowElement in rows">
-		<grid-directive></grid-directive>
+	<h2>Apu's Buy</h2>
+	<div class="container">
+		<div class="row">
+			<div ng-repeat="item in rows">
+				<grid-directive></grid-directive>
+			</div>
+		</div>
 	</div>
 </div>
