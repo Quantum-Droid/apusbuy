@@ -41,6 +41,18 @@ angular.module('myApp.services').service('networkService', function($http){
 			})
 	};
 
+	this.fetchCart = function(){
+		var endpoint = route + '/cart';
+		return $http.get(endpoint)
+			.success((cart) =>{
+				return cart;
+			})
+			.error(()=>{
+				console.log("Error fetching");
+				return null;
+			})
+	}
+
 })
 
 angular.module('myApp.services').service('authenticationService', function($http, $q){
@@ -88,3 +100,4 @@ angular.module('myApp.services').service('inventoryService', function($http){
 			})
 	}
 })
+
