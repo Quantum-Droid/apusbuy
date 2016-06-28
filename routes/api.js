@@ -871,7 +871,7 @@ router.get('/ageRanges', (req,res)=>{
 					userInAgeRanges.ageRangeData[8]++;
 				}
 			}
-			return res.json({ageRangeData: userInAgeRanges});
+			return res.json(userInAgeRanges);
 		}else{
 			return res.json(userInAgeRanges);
 		}

@@ -70,7 +70,7 @@ config(function ($stateProvider, $urlRouterProvider) {
     }).
     // Product
     state('product_analysis', {
-      url: '/product_analysis/:product_id',
+      url: '/product_analysis/',
       templateUrl: 'partials/product_analysis.html',
       controller: 'Controller_ProductAnalysis'
     }).

@@ -1,11 +1,21 @@
 <!--product_analysis.html-->
-<div>
-    <canvas id="doughnut" class="chart chart-doughnut"
-  		chart-data="bestSellersData" chart-labels="bestSellersLabels"></canvas>
-		<canvas id="bar" class="chart chart-bar"
-  		chart-data="ageRangeData" chart-labels="ageRangeLabels"</canvas>
-		<canvas id="radar" class="chart chart-radar"
-  		chart-data="salesPerHourData" chart-labels="salesPerHourLabels"></canvas>
+<div class="container">
+		<h1>Product Analisys</h1>
+		<div class="container">
+			<h1>Best Sellers</h1>
+			<canvas id="doughnut" class="chart chart-doughnut"
+				chart-data="bestSellersData" chart-labels="bestSellersLabels"></canvas>
+		</div>
+		<div class="container">
+			<h1>Users per age range</h1>
+			<canvas id="bar" class="chart chart-bar"
+				chart-data="ageRangeData" chart-labels="ageRangeLabels"></canvas>
+		</div>
+		<div class="container">
+			<h1>Sales per Hour</h1>
+			<canvas id="polar-area" class="chart chart-polar-area"
+				chart-data="salesPerHourData" chart-labels="salesPerHourLabels"></canvas>
+		</div>
 </div>
 
 <!--
