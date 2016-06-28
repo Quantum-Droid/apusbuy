@@ -169,13 +169,27 @@ angular.module('myApp.controllers_client', []).
 
     //Gets a random credit card image
     $scope.randomCardImage = function(){
-      var r = Math.floor((Math.random()*2)+0);
-      return cardThumbs[r];
+      // var r = Math.floor(Math.random() * (3 - 0 + 1)) + 0;      
+      return cardThumbs[2];
     }
-
-    //Redirect to client profile
+    //Redirects to client profile
     $scope.goToUpdate = function(){
       $state.go('client_profile');
+    }
+    //Redirects to login
+    $scope.goToLogin = function(){
+      $state.go('client_login');
+    }
+
+    //Performs a checkout of the client's products
+    $scope.checkout = function(){
+      $http.post(route + '/checkout', {})
+        .success((ans) =>{
+          console.log(ans)
+        })
+        .error((err) =>{
+          console.log(err)
+        })
     }
 
 
