@@ -20,6 +20,9 @@
 		Apellidos: <br/>
 		<input type="text" name="clientLastName" ng-model="clientLastName" class="form-control" />
 		<br/>
+		Fecha de nacimiento (en formato AAAA/MM/DD): <br/>
+		<input type="text" name="clientBirthdate" ng-model="clientBirthdate" class="form-control" />
+		<br/>
 		Profile picture: <br/>
 		<input type="text" name="clientProfilePicture" ng-model="clientProfilePicture" class="form-control" />
 		<br/>
@@ -39,11 +42,13 @@
 		Ciudad: <br/>
 		<input type="text" name="clientAddressCity" ng-model="clientAddressCity" class="form-control" />
 		<br/>
-		Contraseña anterior: <input type="password" name="prev_clientPassword" ng-model="prev_clientPassword" class="form-control" />
-		<br/>
 		Nueva contraseña: <input type="password" name="clientNewPassword" ng-model="clientNewPassword" class="form-control" />
 		<br/>
 		Repetir contraseña: <input type="password" name="clientNewPasswordRepeat" ng-model="clientNewPasswordRepeat" class="form-control" />
+		<br/>
+		<br/>
+		Escribe tu contraseña anterior para guardar cambios: <br/> 
+		<input type="password" name="confirmPassword" ng-model="confirmPassword" class="form-control" />
 		<br/>
 	</form>
 	<button ng-click="saveClientChanges()" class="btn btn-success">Guardar cambios</button> {{saveClientChangesStatus}} <br/><br/>

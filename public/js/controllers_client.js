@@ -31,10 +31,24 @@ angular.module('myApp.controllers_client', []).
     $scope.loadRegister = function() {
       $state.go('client_register');
     }
+
+    // Redirect to admin login.
+    $scope.loadAdminLogin = function() {
+      $state.go('admin_login');
+    }
   }).
   controller('Controller_ClientProfile', function ($scope, $http, $stateParams, $state) {
     // Controller for managing a user's profile.
     $scope.client_id = $stateParams.client_id;
+    $scope.prev_clientPassword = null;
+
+    // Logout function
+    $scope.logout = function() {
+      $http.get(route + '/logout')
+      .then(function successCallback(response) {
+        $state.go('client_login');
+      })
+    }
 
     // Get client
     $scope.getClient = function() {
@@ -43,8 +57,9 @@ angular.module('myApp.controllers_client', []).
         $scope.clientName = response.data.name
         $scope.clientLastName = response.data.lastName
         $scope.clientEmail = response.data.email
+        $scope.clientBirthdate = response.data.birthdate
         var clientIsVerified = response.data.verified
-        $scope.clientPassword = response.data.password
+        $scope.prev_clientPassword = response.data.password
         $scope.clientAddressStreet = response.data.address.street
         $scope.clientAddressPostalCode = response.data.address.postalCode
         $scope.clientAddressNumber = response.data.address.number
@@ -55,30 +70,44 @@ angular.module('myApp.controllers_client', []).
         $scope.clientCartDiscount = response.data.cart.discount
         $scope.clientNumberOfItemsBought = response.data.boughtItems
         if (clientIsVerified) {
-          $scope.clientVerified = 'Yes';
+          $scope.clientVerified = 'Sí';
         } else {
           $scope.clientVerified = 'No';
         }
       }, function errorCallback (response) {
-        console.log('Error while reaching client. ');
+        console.log('Error while reaching client.');
       });
     }
 
     // Save changes to database.
     $scope.saveClientChanges = function() {
-      $http.put(route + '/client?_id=' + $scope.client_id, {
-        "name":$scope.clientName, 
-        "lastName":$scope.clientLastName,
-        "email":$scope.clientEmail,
-        "password":$scope.clientPassword,
-        "street":$scope.clientAddressStreet,
-        "postalCode":$scope.clientAddressPostalCode,
-        "number":$scope.clientAddressNumber,
-        "state":$scope.clientAddressState,
-        "city":$scope.clientAddressCity,
-        // NOTE --> change once CreditCards are implemented.
-        "cards":null
-      });
+      if ($scope.confirmPassword === $scope.prev_clientPassword) {
+        if ($scope.clientNewPassword === $scope.clientNewPasswordRepeat) {
+          $http.put(route + '/client?_id=' + $scope.client_id, {
+            "name":$scope.clientName, 
+            "lastName":$scope.clientLastName,
+            "birthdate":$scope.clientBirthdate,
+            "email":$scope.clientEmail,
+            "password":$scope.clientNewPassword,
+            "street":$scope.clientAddressStreet,
+            "postalCode":$scope.clientAddressPostalCode,
+            "number":$scope.clientAddressNumber,
+            "state":$scope.clientAddressState,
+            "city":$scope.clientAddressCity
+            // NOTE --> change once CreditCards are implemented.
+            //"cards":
+          })
+          .then(function successCallback(response) {
+            $scope.saveClientChangesStatus = 'Datos guardados exitosamente.';
+          }, function errorCallback(response) {
+            $scope.saveClientChangesStatus = 'Error al enviar información.';
+          });
+        } else {
+          $scope.saveClientChangesStatus = 'Las nuevas contraseñas no coinciden.'
+        }
+      } else {
+        $scope.saveClientChangesStatus = 'Contraseña incorrecta.';
+      }
     }
 
     // Delete client account.
@@ -114,16 +143,32 @@ angular.module('myApp.controllers_client', []).
 
     // Register client POST method.
     $scope.makeClientPOST = function() {
-      if ($scope.clientPassword === $scope.clientPasswordRepeat) {
+      if (($scope.clientPassword !== $scope.clientPasswordRepeat) || (
+            $scope.clientEmail === '' || $scope.clientEmail === undefined ||
+            $scope.clientName === '' || $scope.clientName === undefined ||
+            $scope.clientLastName === '' || $scope.clientLastName === undefined ||
+            $scope.clientBirthdate === '' || $scope.clientBirthdate === undefined ||
+            $scope.clientAddressStreet === '' || $scope.clientAddressStreet === undefined ||
+            $scope.clientAddressNumber === '' || $scope.clientAddressNumber === undefined ||
+            $scope.clientAddressState === '' || $scope.clientAddressState === undefined ||
+            $scope.clientAddressCity === '' || $scope.clientAddressCity === undefined ||
+            $scope.clientAddressPostalCode === '' || $scope.clientAddressPostalCode === undefined ||
+            $scope.clientPassword === '' || $scope.clientPassword === undefined
+            //$scope.clientProfilePicture === '' || $scope.clientProfilePicture === undefined ||
+          )) {
+        $scope.clientRegisterStatus = 'Las contraseñas no coinciden y/o hay datos faltantes.';
+      } else {
         $http.post(route + '/register', {
-          "email":$scope.clientEmail || '',
-          "name":$scope.clientName || '',
-          "lastName":$scope.clientLastName || '',
-          "street":$scope.clientAddressStreet || '',
-          "number":$scope.clientAddressNumber || '',
-          "state":$scope.clientAddressState || '',
-          "city":$scope.clientAddressCity || '',
-          "password":$scope.clientPassword || 'password',
+          "email":$scope.clientEmail,
+          "name":$scope.clientName,
+          "lastName":$scope.clientLastName,
+          "birthdate":$scope.clientBirthdate,
+          "street":$scope.clientAddressStreet,
+          "number":$scope.clientAddressNumber,
+          "state":$scope.clientAddressState,
+          "city":$scope.clientAddressCity,
+          "postalCode":$scope.clientAddressPostalCode,
+          "password":$scope.clientPassword
           // NOTE --> Uncomment when available.
           //"profilePicture":$scope.clientProfilePicture
         })
@@ -132,8 +177,6 @@ angular.module('myApp.controllers_client', []).
         }, function errorCallback(response) {
           $scope.clientRegisterStatus = 'Error al crear la cuenta.'
         });
-      } else {
-        $scope.clientRegisterStatus = 'Las contraseñas no coinciden.';
       }
     }
   }).

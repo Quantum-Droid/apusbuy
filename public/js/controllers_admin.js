@@ -44,6 +44,14 @@ angular.module('myApp.controllers_admin', []).
     // Web page so Admin Salesman can manage products.
     $scope.addProductStatus = '';
 
+    // Logout function
+    $scope.logout = function() {
+      $http.get(route + '/logout')
+      .then(function successCallback(response) {
+        $state.go('admin_login');
+      })
+    }
+
     // Get all available products.
     $scope.showProducts = function() {
       $http.get(route + '/products')
@@ -64,8 +72,11 @@ angular.module('myApp.controllers_admin', []).
       // POST method that adds a new salesman.
       $http.post(route + '/product', {
         "name":$scope.new_name,
+        "description":$scope.new_description,
         "price":$scope.new_price,
-        "categories":categoriesArray
+        "image":$scope.new_imageURL,
+        "categories":categoriesArray,
+        "ammount":$scope.new_ammount
       })
       .then(function successCallback(response) {
         $scope.addProductStatus = "El producto se agregó exitosamente.";
@@ -88,10 +99,8 @@ angular.module('myApp.controllers_admin', []).
     $scope.logout = function() {
       $http.get(route + '/logout')
       .then(function successCallback(response) {
-        $state.go('main_menu');
-      }, function errorCallback(response) {
-        console.log('Couldn\'t log out.');
-      });
+        $state.go('admin_login');
+      })
     }
 
     // Getting the list of salesmen.
@@ -115,7 +124,7 @@ angular.module('myApp.controllers_admin', []).
     $scope.logout = function() {
       $http.get(route + '/logout')
       .then(function successCallback(response) {
-        $state.go('main_menu');
+        $state.go('admin_login');
       })
     }
 
@@ -219,7 +228,7 @@ angular.module('myApp.controllers_admin', []).
     $scope.logout = function() {
       $http.get(route + '/logout')
       .then(function successCallback(response) {
-        $state.go('main_menu');
+        $state.go('admin_login');
       }, function errorCallback(response) {
         console.log('Couldn\'t log out.');
       });

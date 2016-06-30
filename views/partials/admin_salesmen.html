@@ -37,13 +37,25 @@
 			<span class="error-message" ng-show="addProductForm.new_name.$dirty && addProductForm.new_name.$error.required">
 				El nombre es necesario.
 			</span> <br/>
+			Descripción: <input type="text" name="new_description" ng-model="new_description" ng-required="true" class="form-control" />
+			<span class="error-message" ng-show="addProductForm.new_description.$dirty && addProductForm.new_description.$error.required">
+				La descripción es necesaria.
+			</span> <br/>
 			Precio: <input type="text" name="new_price" ng-model="new_price" ng-required="true" class="form-control" />
 			<span class="error-message" ng-show="addProductForm.new_price.$dirty && addProductForm.new_price.$error.required">
 				El precio es necesario.
 			</span> <br/>
+			URL Imagen: <input type="text" name="new_imageURL" ng-model="new_imageURL" ng-required="true" class="form-control" />
+			<span class="error-message" ng-show="addProductForm.new_imageURL.$dirty && addProductForm.new_imageURL.$error.required">
+				El URL de la imagen es necesario.
+			</span> <br/>
 			Categorías (separadas por comas): <input type="text" name="new_categories" ng-model="new_categories" ng-required="true" class="form-control" />
 			<span class="error-message" ng-show="addProductForm.new_categories.$dirty && addProductForm.new_categories.$error.required">
 				Las categorías (o categoría) son necesarias.
+			</span> <br/>
+			Cantidad en stock: <input type="text" name="new_ammount" ng-model="new_ammount" ng-required="true" class="form-control" />
+			<span class="error-message" ng-show="addProductForm.new_ammount.$dirty && addProductForm.new_ammount.$error.required">
+				La cantidad en stock es necesaria.
 			</span> <br/>
 		</form>
 		<button ng-click="addProduct(); showProducts()" class="btn btn-primary">Agregar</button> {{addProductStatus}}
