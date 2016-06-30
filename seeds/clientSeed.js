@@ -26,6 +26,7 @@ db.once('open', () =>{
         client.email = "steve.stevenson@itesm.mx";
         client.password = "topKek";
         client.verified = true;
+        client.avatar = "http://www.lovemarks.com/wp-content/uploads/profile-avatars/default-avatar-rainbow-unicorn.png"
         client.address = address;        
         client.cards = [
             {
@@ -58,7 +59,8 @@ db.once('open', () =>{
             client2.email = "testi.cle@itesm.mx";
             client2.password = "password";
             client2.verified = false;
-            client2.address = null; 
+            client2.address = null;
+            client2.avatar = "http://vignette1.wikia.nocookie.net/clubpenguin/images/9/90/Top_Kek.png/revision/latest?cb=20150414001359"
             client2.cards = [];
             client2.cart.discount = 0;
             client2.save((err,c2) =>{
