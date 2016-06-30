@@ -16,6 +16,11 @@ img.grid {
 	width: auto;
 	text-align: center;
 }
+img.profilePicture {
+	height: 50px;
+	max-width: 50px;
+	width: auto;
+}
 body {
   padding-top: 50px;
 }

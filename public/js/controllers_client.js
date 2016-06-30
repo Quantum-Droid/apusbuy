@@ -19,9 +19,10 @@ angular.module('myApp.controllers_client', []).
       })
       .then(function successCallback(response) {
         var id = response.data._id;
-        $state.go('client_profile', {
-          client_id: id
-        });
+        // Emit a login event
+        $scope.$emit('loginEvent');
+        // Go to main_menu
+        $state.go('main_menu');
       }, function errorCallback(response) {
         console.log('Could\'t login client.');
       });
@@ -42,14 +43,14 @@ angular.module('myApp.controllers_client', []).
     $scope.client_id = $stateParams.client_id;
     $scope.prev_clientPassword = null;
 
-    // Logout function
+/*    // Logout function
     $scope.logout = function() {
       $http.get(route + '/logout')
       .then(function successCallback(response) {
         $state.go('client_login');
       })
     }
-
+*/
     // Get client
     $scope.getClient = function() {
       $http.get(route + '/client?_id=' + $scope.client_id)

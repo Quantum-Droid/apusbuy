@@ -35,6 +35,8 @@ angular.module('myApp.controllers_admin', []).
         } else if (role === undefined) {
           console.log('User undefined.')
         }
+        // Emit a login event
+        $scope.$emit('loginEvent');
       }, function errorCallback(response) {
         console.log('Couldn\'t make login request!');
       });
@@ -44,13 +46,13 @@ angular.module('myApp.controllers_admin', []).
     // Web page so Admin Salesman can manage products.
     $scope.addProductStatus = '';
 
-    // Logout function
+/*    // Logout function
     $scope.logout = function() {
       $http.get(route + '/logout')
       .then(function successCallback(response) {
         $state.go('admin_login');
       })
-    }
+    }*/
 
     // Get all available products.
     $scope.showProducts = function() {

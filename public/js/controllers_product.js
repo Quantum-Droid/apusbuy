@@ -8,17 +8,67 @@ angular.module('myApp.controllers_product', []).
   controller('Controller_MainMenu', function ($scope, $http, $state, $stateParams, networkService) {
   	// Controller that is used for displaying the available items when on the main page.
 
+    // Get active user (the active sesion)
+    $scope.getClientSession = function() {
+      $http.get(route + '/current')
+      .then(function successCallbackFunction(response) {
+        if (response.data.user) {
+          console.log('Ok Response = ' + response.data.admin);
+          $scope.activeUser = response.data.user;
+          $scope.userIsAdmin = response.data.admin;
+          $scope.activeSession = true;
+        } else {
+          console.log('NULL Response = ' + response.data.admin);
+          $scope.activeUser = null;
+          $scope.userIsAdmin = null;
+          $scope.activeSession = false;
+        }
+        console.log($scope.activeSession);
+      }, function errorCallbackFunction(response) {
+        console.log('Client session could not be established');
+      });
+    }
+
+    // Method to listen to login events
+    $scope.$on('loginEvent', function(loginEvent) {
+      $scope.getClientSession();
+    });
+
+    // Method to listen to logout events
+    $scope.$on('logoutEvent', function(loginEvent) {
+      $scope.getClientSession();
+    });
+
+    // Method to load profile if user is a client
+    $scope.loadProfile = function() {
+      if (!$scope.userIsAdmin) {
+        $state.go('client_profile', {
+          client_id: $scope.activeUser._id
+        });
+      }
+    }
+
+    // Logout method
+    $scope.logout = function() {
+      if ($scope.activeSession) {
+        $http.get(route + '/logout')
+        .then(function successCallbackFunction(response) {
+          if ($scope.userIsAdmin) {
+            $state.go('admin_login');
+          } else {
+            $state.go('client_login');
+          }
+          // Emit logout event
+          $scope.$emit('logoutEvent');
+        });
+      }
+    }
+
     // Method to get all available products.
     $scope.getProducts = function() {
       $http.get(route + '/products')
-      .then(function succeedCallbackFunction(response) {
+      .then(function successCallbackFunction(response) {
         $scope.rows = response.data;
-        // To order by groups of 3.
-        //var arrays = [], size = 3;
-        //while ($scope.rows.length > 0) {
-        //  arrays.push($scope.rows.splice(0, size));
-        //}        
-        //$scope.rows = arrays;
       }, function errorCallbackFunction(response) {
         console.log('Couldn\'t make products petition.');
       });
@@ -32,6 +82,7 @@ angular.module('myApp.controllers_product', []).
       });
     };
 
+    $scope.getClientSession();
     $scope.getProducts();
 
   }).
