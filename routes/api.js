@@ -13,6 +13,7 @@ var Client  = require('../models/client');
 var Admin = require('../models/admin');
 var Product = require('../models/product');
 var Inventory = require('../models/inventory');
+var Sale = require('../models/sale');
 
 const CLIENT_NOT_FOUND_ERROR = "Could not find client in the DB.";
 const PRODUCT_NOT_FOUND_ERROR = "Could not find product in the DB."
@@ -32,6 +33,8 @@ var THIRD_DISCOUNT_REQUIREMENT = 20; //20 bought items needed for first discount
 const SU_ROLE = "Super User";
 const VENTAS_ROLE = "Ventas";
 const RH_ROLE = "Recursos Humanos"
+
+const MAX_BEST_SELLERS = 10;
 
 module.exports = router;
 
@@ -269,9 +272,9 @@ router.get('/clients', (req, res) => {
 			return res.json(clients ? clients.length : 0);
 		})
 	}else{
-		Client.find({}, (err, clients) => {		
-		return res.json(clients ? clients.length : 0);
-	});
+		Client.find({}, (err, clients) => {
+			return res.json(clients ? clients.length : 0);
+		});
 	}	
 });
 
@@ -475,13 +478,13 @@ router.post('/product', (req, res) => {
   product.price = req.body.price;
   product.image = req.body.iamge;
   product.categories = req.body.categories;  
-  var ammount = req.body.ammount;
+  var amount = req.body.amount;
 
   product.save((err, p) => {
   	if (!err) {  		
   		Inventory.findOne((err, inventory) =>{
   			if(!err && inventory){
-  				inventory.items.push({product: p, ammount: ammount})
+  				inventory.items.push({product: p, amount: amount})
   				inventory.save((err,savedInventory) =>{
   					if(!err)
   						return res.json(p);
@@ -627,14 +630,14 @@ router.put('/cart', (req,res) =>{
 		if(validParams(req.body)){
 			id = ObjectId(id);
 			var productId = ObjectId(req.body.product);
-			var ammount = req.body.ammount;
+			var amount = req.body.amount;
 			var action = req.body.action;	
 			Client.findOne(id,(err, client) =>{ //get client from DB			
 				if(!err && client){ //client found
 					if(action === "add"){ //add product to client's cart
 						Product.findOne(productId, (err, product) =>{ //get product from DB
 							if(!err && product){ //product found
-								client.cart.orders.push({"product": product, "ammount": ammount});
+								client.cart.orders.push({"product": product, "amount": amount});
 								client.save((err, savedClient) =>{ //update client in DB.
 									if(!err){
 										return res.json(savedClient);
@@ -675,8 +678,8 @@ router.post('/checkout', (req,res) =>{
 								for (var j = client.cart.orders.length - 1; j >= 0; j--) {									
 									if(inventory.items[i].product.toString() === 
 										client.cart.orders[j].product.toString()){
-										//found product in inventory -> update ammounts available										
-										inventory.items[i].ammount -= client.cart.orders[j].ammount;																												
+										//found product in inventory -> update amounts available										
+										inventory.items[i].amount -= client.cart.orders[j].amount;																												
 									}
 								}	
 							}
@@ -717,7 +720,7 @@ router.post('/checkout', (req,res) =>{
 /*************** INVENTORY SECTION *******************/
 
 /*
-* Returns the ammount of a product
+* Returns the amount of a product
 * available in the inventory
 */
 router.get('/inventory', (req,res) =>{
@@ -726,13 +729,159 @@ router.get('/inventory', (req,res) =>{
 		id = new ObjectId(id);
 		Inventory.findOne((err,inventory) =>{
 			if(!err && inventory){
-				var ammount = -1;
+				var amount = -1;
 				inventory.items.forEach((item) =>{
 					if(item.product.toString() === id.toString())
-						ammount = item.ammount
+						amount = item.amount
 				})
-				return res.json(ammount)
+				return res.json(amount)
 			}else return res.json(null);
 		})
 	}else return res.json(null);
 })
+
+/***************** SALES SECTION *********************/
+
+/*
+* Add a sale to the database, needs productId and amount
+*/
+router.post('/sale', (req,res)=>{
+	var sale = new Sale();
+	sale.product = req.body.product;
+	sale.amount = req.body.amount;
+
+	sale.save((err, obj) => {
+  	if (!err && obj) {
+  		console.log(obj.product + ' saved.');
+			return res.json(obj);
+  	}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR));
+  });
+});
+
+/***************** CHART SECTION *********************/
+
+function compareSales(sale1, sale2){
+	if(sale1.amount < sale2.amount) return 1;
+	if(sale1.amount > sale2.amount) return -1;
+	return 0;
+}
+
+/*
+* Return the 10 best sellers
+*/
+router.get('/bestSellers', (req,res)=>{
+	var bestSellers = {};
+	var bestSellersData = [];
+	var bestSellersLabels = [];
+	var bstTmp = [];
+	Sale.find({}, (err, sales)=>{
+		if(!err && sales){
+			Sale.populate(sales,'product', (err, docs) =>{
+				if(!err && docs){
+					for(var i in docs){
+						if(bestSellers[docs[i].product.name] !== undefined){
+							bestSellers[docs[i].product.name] += docs[i].amount;
+						}else{
+							bestSellers[docs[i].product.name] = docs[i].amount;
+						}
+					}
+					for(var i in bestSellers){
+						bstTmp.push({name: i, amount: bestSellers[i]});
+					}
+					bstTmp.sort(compareSales);
+					for(var i in bstTmp){
+						if(i >= MAX_BEST_SELLERS){
+							break;
+						}
+						bestSellersLabels.push(bstTmp[i].name);
+						bestSellersData.push(bstTmp[i].amount);
+					}
+					return res.json({bestSellersData: bestSellersData, bestSellersLabels: bestSellersLabels});
+				}else{
+					return res.json(null);
+				}
+			});
+		}else{
+			return res.json(null);
+		}
+	});
+});
+
+/*
+* Returns the amount of sales per hour
+*/
+router.get('/salesPerHour', (req, res)=>{
+	var salesPerHour = [0,0,0,0,0,0,
+											0,0,0,0,0,0,
+											0,0,0,0,0,0,
+											0,0,0,0,0,0];
+	Sale.find({}, (err, sales)=>{
+		if(!err && sales){
+			console.log("Now "+new Date());
+			for(var i in sales){
+				salesPerHour[new Date(sales[i].createdAt).getHours()] += 1;
+			}
+			return res.json({salesPerHourData: salesPerHour});
+		}else{
+			return res.json(null);
+		}
+	});
+});
+
+/*
+* Get age like "YYYY/MM/DD"
+*/
+function getAge(dateString) {
+	var today = new Date();
+	var birthDate = new Date(dateString);
+	var age = today.getFullYear() - birthDate.getFullYear();
+	var m = today.getMonth() - birthDate.getMonth();
+	if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+		age--;
+	}
+	return age;
+}
+
+/*
+* Returns the amount of users in all the age age ranges 
+*/
+router.get('/ageRanges', (req,res)=>{
+	var userInAgeRanges = {ageRangeData: [0,0,0,0,0,0,0,0,0]};
+	Client.find({}, (err, clients) => {
+		if(!err && clients){
+			for(var i in clients){
+				var age = getAge(clients[i].birthdate);
+				if(0 < age && age <= 12){
+					userInAgeRanges.ageRangeData[0]++;
+				}else if(12 < age && age <= 17){
+					userInAgeRanges.ageRangeData[1]++;
+				}else if(17 < age && age <= 24){
+					userInAgeRanges.ageRangeData[2]++;
+				}else if(24 < age && age <= 34){
+					userInAgeRanges.ageRangeData[3]++;
+				}else if(34 < age && age <= 44){
+					userInAgeRanges.ageRangeData[4]++;
+				}else if(44 < age && age <= 54){
+					userInAgeRanges.ageRangeData[5]++;
+				}else if(54 < age && age <= 64){
+					userInAgeRanges.ageRangeData[6]++;
+				}else if(64 < age && age <= 74){
+					userInAgeRanges.ageRangeData[7]++;
+				}else if(74 < age){
+					userInAgeRanges.ageRangeData[8]++;
+				}
+			}
+			return res.json(userInAgeRanges);
+		}else{
+			return res.json(userInAgeRanges);
+		}
+		
+	});
+});
+
+
+
+
+
+
+

@@ -9,7 +9,8 @@ angular.module('myApp', [
   'myApp.filters',
   'myApp.services',
   'myApp.directives',
-  'ui.router'
+  'ui.router',
+	'chart.js'
 ]).
 config(function ($stateProvider, $urlRouterProvider) {
   // States
@@ -69,7 +70,7 @@ config(function ($stateProvider, $urlRouterProvider) {
     }).
     // Product
     state('product_analysis', {
-      url: '/product_analysis/:product_id',
+      url: '/product_analysis/',
       templateUrl: 'partials/product_analysis.html',
       controller: 'Controller_ProductAnalysis'
     }).

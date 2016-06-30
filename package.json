@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "angular-chart.js": "^1.0.0-alpha8",
     "async": "^2.0.0-rc.6",
     "body-parser": "^1.0.2",
     "bootstrap": "^3.3.6",

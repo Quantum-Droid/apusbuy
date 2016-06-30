@@ -22,7 +22,7 @@ db.once('open', () =>{
 		var client = new Client();
 		client.name = "Steve";
         client.lastName = "Mc Stevens";
-				client.birthdate = "13/01/1990";
+				client.birthdate = "1990/01/13";
         client.email = "steve.stevenson@itesm.mx";
         client.password = "topKek";
         client.verified = true;
@@ -54,13 +54,13 @@ db.once('open', () =>{
             var client2 = new Client();
             client2.name = "Testi";
             client2.lastName = "Cle.";
-						client.birthdate = "13/01/1970";
+						client2.birthdate = "1970/01/13";
             client2.email = "testi.cle@itesm.mx";
             client2.password = "password";
             client2.verified = false;
             client2.address = null; 
-            client.cards = [];
-            client.cart.discount = 0;
+            client2.cards = [];
+            client2.cart.discount = 0;
             client2.save((err,c2) =>{
                 callback();
             })
