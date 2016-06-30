@@ -726,18 +726,19 @@ router.post('/checkout', (req,res) =>{
 router.get('/inventory', (req,res) =>{
 	var id = req.query._id;
 	if(id){
-		id = new ObjectId(id);
+		id = new ObjectId(id);		
 		Inventory.findOne((err,inventory) =>{
-			if(!err && inventory){
+			if(!err && inventory){				
 				var amount = -1;
 				inventory.items.forEach((item) =>{
-					if(item.product.toString() === id.toString())
-						amount = item.amount
-				})
+					if(item.product.toString() === id.toString()){
+						amount = item.ammount
+					}
+				})				
 				return res.json(amount)
-			}else return res.json(null);
+			}else return res.json("err");
 		})
-	}else return res.json(null);
+	}else return res.json("wtf");
 })
 
 /***************** SALES SECTION *********************/

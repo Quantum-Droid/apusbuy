@@ -10,6 +10,7 @@ var clientSchema = mongoose.Schema({
 	email: String,
 	verified: Boolean,
 	password: String,
+	avatar: {type: String, default: "https://1.bp.blogspot.com/-XaPPe3eCMwE/VZSjxETf2OI/AAAAAAAANzE/3uOIgVpxds0/s1600/avatar.png"},
 	address: {
 		street: String,
 		postalCode: String,
