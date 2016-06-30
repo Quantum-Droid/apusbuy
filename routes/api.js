@@ -217,16 +217,16 @@ router.get('/current', (req,res) =>{
 			Admin.findOne({_id: id}, (err, admin) =>{
 				if(!err && admin)
 					return res.json({user: admin, admin: true});
-				else return res.json(null);
+				else return res.json({user: false});
 			})
 		}else{//client
 			Client.findOne({_id: id}, (err, client) =>{
 				if(!err && client)
 					return res.json({user: client, admin: false})
-				else return res.json(null);
+				else return res.json({user: false});
 			})
 		}
-	}else return res.json(null);
+	}else return res.json({user: false});
 })
 
 //admin login send email and password in the body
