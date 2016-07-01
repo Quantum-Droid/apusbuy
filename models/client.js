@@ -24,7 +24,7 @@ var clientSchema = mongoose.Schema({
 		expirationDate: String
 	}],
 	cart: {
-		orders: [{product: {type: ObjectId, ref: 'Product'}, amount: Number}],
+		orders: [{product: {type: ObjectId, ref: 'Product'}, ammount: Number}],
 		discount: {type: Number, default: 0},		
 	},
 	boughtItems: {type: Number, default: 0}		

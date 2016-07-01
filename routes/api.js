@@ -288,6 +288,7 @@ router.put('/client', (req, res) => {
 			client.name = req.body.name ? req.body.name : client.name;
 			client.lastName = req.body.lastName ? req.body.lastName : client.lastName;
 			client.birthdate = req.body.birthdate ? req.body.birthdate : client.birthdate;
+			client.avatar = req.body.avatar ? req.body.avatar : client.avatar;
 			client.password = req.body.password ? req.body.password : client.password;
 			client.address.street = req.body.street ? req.body.street : client.address.street;
 			client.address.postalCode = req.body.postalCode ? req.body.postalCode : client.address.postalCode;
@@ -477,14 +478,14 @@ router.post('/product', (req, res) => {
   product.description = req.body.description;
   product.price = req.body.price;
   product.image = req.body.iamge;
-  product.categories = req.body.categories;  
-  var amount = req.body.amount;
+  product.categories = req.body.categories;
+  var ammount = req.body.ammount;
 
   product.save((err, p) => {
   	if (!err) {  		
   		Inventory.findOne((err, inventory) =>{
   			if(!err && inventory){
-  				inventory.items.push({product: p, amount: amount})
+  				inventory.items.push({product: p, ammount: ammount})
   				inventory.save((err,savedInventory) =>{
   					if(!err)
   						return res.json(p);
@@ -630,14 +631,14 @@ router.put('/cart', (req,res) =>{
 		if(validParams(req.body)){
 			id = ObjectId(id);
 			var productId = ObjectId(req.body.product);
-			var amount = req.body.amount;
+			var ammount = req.body.ammount;
 			var action = req.body.action;	
 			Client.findOne(id,(err, client) =>{ //get client from DB			
 				if(!err && client){ //client found
 					if(action === "add"){ //add product to client's cart
 						Product.findOne(productId, (err, product) =>{ //get product from DB
 							if(!err && product){ //product found
-								client.cart.orders.push({"product": product, "amount": amount});
+								client.cart.orders.push({"product": product, "ammount": ammount});
 								client.save((err, savedClient) =>{ //update client in DB.
 									if(!err){
 										return res.json(savedClient);
@@ -678,8 +679,20 @@ router.post('/checkout', (req,res) =>{
 								for (var j = client.cart.orders.length - 1; j >= 0; j--) {									
 									if(inventory.items[i].product.toString() === 
 										client.cart.orders[j].product.toString()){
-										//found product in inventory -> update amounts available										
-										inventory.items[i].amount -= client.cart.orders[j].amount;																												
+										//found product in inventory -> update ammounts available										
+										inventory.items[i].ammount -= client.cart.orders[j].ammount;
+										var prod_id = client.cart.orders[j].product;
+										var amm = client.cart.orders[j].ammount;
+										var sale = new Sale();
+										sale.product = prod_id;
+										sale.ammount = amm;
+										console.log(sale)
+										sale.save((err, obj) => {
+									  	if (!err && obj) {
+									  		console.log(obj.product + ' saved.');												
+									  	}else return res.json(responseError(ELEMENT_NOT_SAVED_ERROR));
+									  });
+
 									}
 								}	
 							}
@@ -720,7 +733,7 @@ router.post('/checkout', (req,res) =>{
 /*************** INVENTORY SECTION *******************/
 
 /*
-* Returns the amount of a product
+* Returns the ammount of a product
 * available in the inventory
 */
 router.get('/inventory', (req,res) =>{
@@ -729,13 +742,13 @@ router.get('/inventory', (req,res) =>{
 		id = new ObjectId(id);		
 		Inventory.findOne((err,inventory) =>{
 			if(!err && inventory){				
-				var amount = -1;
+				var ammount = -1;
 				inventory.items.forEach((item) =>{
 					if(item.product.toString() === id.toString()){
-						amount = item.ammount
+						ammount = item.ammount
 					}
 				})				
-				return res.json(amount)
+				return res.json(ammount)
 			}else return res.json("err");
 		})
 	}else return res.json("wtf");
@@ -744,12 +757,12 @@ router.get('/inventory', (req,res) =>{
 /***************** SALES SECTION *********************/
 
 /*
-* Add a sale to the database, needs productId and amount
+* Add a sale to the database, needs productId and ammount
 */
 router.post('/sale', (req,res)=>{
 	var sale = new Sale();
 	sale.product = req.body.product;
-	sale.amount = req.body.amount;
+	sale.ammount = req.body.ammount;
 
 	sale.save((err, obj) => {
   	if (!err && obj) {
@@ -759,11 +772,21 @@ router.post('/sale', (req,res)=>{
   });
 });
 
+function newSale (product_id, ammount) {
+	 sale = new Sale();
+	 sale.save((err, obj) => {
+  	if (!err && obj) {
+  		console.log(obj.product + ' saved.');
+			return true;
+  	}else return false;
+  });
+}
+
 /***************** CHART SECTION *********************/
 
 function compareSales(sale1, sale2){
-	if(sale1.amount < sale2.amount) return 1;
-	if(sale1.amount > sale2.amount) return -1;
+	if(sale1.ammount < sale2.ammount) return 1;
+	if(sale1.ammount > sale2.ammount) return -1;
 	return 0;
 }
 
@@ -781,13 +804,13 @@ router.get('/bestSellers', (req,res)=>{
 				if(!err && docs){
 					for(var i in docs){
 						if(bestSellers[docs[i].product.name] !== undefined){
-							bestSellers[docs[i].product.name] += docs[i].amount;
+							bestSellers[docs[i].product.name] += docs[i].ammount;
 						}else{
-							bestSellers[docs[i].product.name] = docs[i].amount;
+							bestSellers[docs[i].product.name] = docs[i].ammount;
 						}
 					}
 					for(var i in bestSellers){
-						bstTmp.push({name: i, amount: bestSellers[i]});
+						bstTmp.push({name: i, ammount: bestSellers[i]});
 					}
 					bstTmp.sort(compareSales);
 					for(var i in bstTmp){
@@ -795,7 +818,7 @@ router.get('/bestSellers', (req,res)=>{
 							break;
 						}
 						bestSellersLabels.push(bstTmp[i].name);
-						bestSellersData.push(bstTmp[i].amount);
+						bestSellersData.push(bstTmp[i].ammount);
 					}
 					return res.json({bestSellersData: bestSellersData, bestSellersLabels: bestSellersLabels});
 				}else{
@@ -809,7 +832,7 @@ router.get('/bestSellers', (req,res)=>{
 });
 
 /*
-* Returns the amount of sales per hour
+* Returns the ammount of sales per hour
 */
 router.get('/salesPerHour', (req, res)=>{
 	var salesPerHour = [0,0,0,0,0,0,
@@ -844,7 +867,7 @@ function getAge(dateString) {
 }
 
 /*
-* Returns the amount of users in all the age age ranges 
+* Returns the ammount of users in all the age age ranges 
 */
 router.get('/ageRanges', (req,res)=>{
 	var userInAgeRanges = {ageRangeData: [0,0,0,0,0,0,0,0,0]};
