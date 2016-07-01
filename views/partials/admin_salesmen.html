@@ -24,7 +24,7 @@
 				<th><a ng-click="filterOptions('categories')">Categorías</a></th>
 			</tr>
 			<tr ng-repeat="product in products | orderBy: filterOption">
-				<td><a ng-click="loadProductDetails()">{{product.name}}</a></td>	
+				<td><a ng-click="loadProductDetails(product._id)">{{product.name}}</a></td>	
 				<td>{{product.price}}</td>
 				<td>{{product.categories}}</td>
 			</tr>

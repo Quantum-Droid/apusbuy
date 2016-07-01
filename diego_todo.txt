@@ -1,8 +1,2 @@
 Diego To-do:
-	- Generar vista de producto -> product_detail.html ==> REYNA
-	- Pedir ayuda para gráficas -> product_analysis.html ==> ALEX
-	- Terminar detalles visuales con bootstrapA
-	- Logout bonito
 	- Repara link desde pantalla admin salesman a detalle de producto (agregar getProductDetails con id)
-	- Nueva pantalla de inicio de sesion
-	- Reacomodar barra de navegacion

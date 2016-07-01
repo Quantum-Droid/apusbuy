@@ -1,6 +1,7 @@
 <div class="container">
 	<!-- Template for main menu. It should display some of the products in inventory. -->
-	<h2>Apu's Buy</h2>
+	<h2 ng-hide="!activeSession">¡Bienvenido, {{activeUser.name}}!</h2>
+	<h2 ng-hide="activeSession">¡Bienvenido a Apu's Buy!</h2>
 	<div class="container">
 		<div class="row">
 			<div ng-repeat="item in rows">

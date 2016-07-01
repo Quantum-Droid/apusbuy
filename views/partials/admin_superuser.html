@@ -58,10 +58,14 @@
 			<span class="error-message" ng-show="addAdminForm.new_email.$dirty && addAdminForm.new_email.$error.required">
 				El email es necesario.
 			</span> <br/>
-			Rol: <input type="text" name="new_role" ng-model="new_role" ng-required="true" class="form-control" />
+		  	<input type="radio" name="new_role" value="Ventas" checked> Ventas 
+		  	<input type="radio" name="new_role" value="Recursos Humanos"> Recursos Humanos 
+		  	<input type="radio" name="new_role" value="Super User"> Súperusuario
+		  	<br/>
+			<!-- Rol: <input type="text" name="new_role" ng-model="new_role" ng-required="true" class="form-control" />
 			<span class="error-message" ng-show="addAdminForm.new_role.$dirty && addAdminForm.new_role.$error.required">
 				El rol es necesario (Ventas, Recursos Humanos, Super Usuario).
-			</span> <br/>
+			</span> --> <br/>
 			Contraseña: <input type="password" name="new_password" ng-model="new_password" ng-required="true" class="form-control" />
 			<span class="error-message" ng-show="addAdminForm.new_password.$dirty && addAdminForm.new_password.$error.required">
 				La contraseña es necesaria.

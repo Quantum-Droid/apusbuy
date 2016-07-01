@@ -54,6 +54,13 @@ angular.module('myApp.controllers_admin', []).
       })
     }*/
 
+    // Get product details.
+    $scope.getProductDetails = function(id) {
+      $state.go('product_details', {
+        product_id: id
+      });
+    }
+
     // Get all available products.
     $scope.showProducts = function() {
       $http.get(route + '/products')

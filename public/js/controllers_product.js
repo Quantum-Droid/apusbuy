@@ -13,17 +13,29 @@ angular.module('myApp.controllers_product', []).
       $http.get(route + '/current')
       .then(function successCallbackFunction(response) {
         if (response.data.user) {
-          console.log('Ok Response = ' + response.data.admin);
           $scope.activeUser = response.data.user;
           $scope.userIsAdmin = response.data.admin;
           $scope.activeSession = true;
+          $scope.numberOfOrders = 0;
+          /*          
+          $http.get(route + '/cart')
+          .then(function successCallbackFunction(response) {
+            var orders = response.data.orders;
+            for (var i = 0; i<orders.length; i++) {
+              $scope.numberOfOrders += orders[i].ammount;
+              console.log('ammount ' + orders[i].ammount);
+            }
+          });
+          */          
+          var orders = $scope.activeUser.cart.orders;
+          for (var i = 0; i<orders.length; i++) {
+            $scope.numberOfOrders += orders[i].ammount;
+          }
         } else {
-          console.log('NULL Response = ' + response.data.admin);
           $scope.activeUser = null;
           $scope.userIsAdmin = null;
           $scope.activeSession = false;
         }
-        console.log($scope.activeSession);
       }, function errorCallbackFunction(response) {
         console.log('Client session could not be established');
       });
