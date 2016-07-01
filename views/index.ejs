@@ -45,7 +45,7 @@
                     <a ng-click="logout()" class="navbar-brand" ng-hide="!activeSession">Cerrar sesión</a>
                     <img ng-click="loadProfile()" ng-src="{{activeUser.avatar}}" class="profilePicture" ng-hide="!activeSession || userIsAdmin">
                     <a ui-sref="client_shopping_cart" ng-hide="userIsAdmin || !activeSession" class="btn btn-default">
-                        <span class="glyphicon glyphicon-shopping-cart"></span> {{numberOfOrders}}
+                        <span class="glyphicon glyphicon-shopping-cart"></span> {{itemsInCart}}
                     </a>
                 </div>
                 <div id="navbar" class="collapse navbar-collapse">
@@ -58,7 +58,7 @@
             </div>
         </nav>
 
-        <div class="container">
+        <div class="container main-content">
         <br/>
         <br/>
             <!-- This is for AngularJS View -->

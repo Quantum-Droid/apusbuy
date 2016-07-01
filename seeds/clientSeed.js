@@ -32,12 +32,14 @@ db.once('open', () =>{
             {
                 "number": 5555555555554444,
                 "code": 123,
-                "expirationDate": "11/17"
+                "expirationDate": "11/17",
+                "cardType": "visa"
             },
             {
                 "number": 5105105105105100,
                 "code": 456,
-                "expirationDate": "08/19"
+                "expirationDate": "08/19",
+                "cardType": "american express"
             }
         ],
         client.cart.discount = 0;

@@ -54,16 +54,26 @@
 	<button ng-click="saveClientChanges()" class="btn btn-success">Guardar cambios</button> {{saveClientChangesStatus}} <br/><br/>
 	Cuenta de correo: {{clientEmail}} <br/>
 	Verificado: {{clientVerified}}
-	<p>
-		<h4>Mis compras</h4>
+	
+	<div>
+		<h4>Compras</h4>
 		<p>
-			Descuento: {{clientCartDiscount}} <br/>
+			Descuento: {{clientCartDiscount}} % <br/>
 			<button ng-click="loadShoppingCart()" class="btn btn-info">Mi carrito de compras</button>
-		</p>
-	</p>
-	<p>
+		</p>	
+	</div>	
+	
+	<div>		
+		<a ng-click="goToWallet()" class="btn btn-info btn-lg">
+      <span class="glyphicon glyphicon-credit-card"></span> 
+      Mis tarjetas
+    </a>
+	</div>
+
+	<div>
 		<h4>Borrar cuenta</h4>
 		Eliminar mi cuenta. Esto no se puede deshacer. <br/>
 		<button ng-click="deleteClient()" class="btn btn-danger">Borrar cuenta</button>
-	</p>
+	</div>	
+	
 </div>

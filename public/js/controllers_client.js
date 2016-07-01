@@ -42,6 +42,7 @@ angular.module('myApp.controllers_client', []).
     // Controller for managing a user's profile.
     $scope.client_id = $stateParams.client_id;
     $scope.prev_clientPassword = null;
+    
 
 /*    // Logout function
     $scope.logout = function() {
@@ -52,25 +53,25 @@ angular.module('myApp.controllers_client', []).
     }
 */
     // Get client
-    $scope.getClient = function() {
-      $http.get(route + '/client?_id=' + $scope.client_id)
-      .then(function successCallback(response) {
+    $scope.getClient = function() {      
+      $http.get(route + '/client')
+      .then(function successCallback(response) {        
         $scope.clientName = response.data.name
         $scope.clientLastName = response.data.lastName
         $scope.clientEmail = response.data.email
         $scope.clientBirthdate = response.data.birthdate
         $scope.clientProfilePicture = response.data.avatar
         var clientIsVerified = response.data.verified
-        $scope.prev_clientPassword = response.data.password
+        $scope.prev_clientPassword = response.data.password        
+        $scope.clientAddressCreditCards = response.data.cards
+        $scope.clientCartOrders = response.data.cart.orders
+        $scope.clientCartDiscount = response.data.cart.discount        
+        $scope.clientNumberOfItemsBought = response.data.boughtItems
         $scope.clientAddressStreet = response.data.address.street
         $scope.clientAddressPostalCode = response.data.address.postalCode
         $scope.clientAddressNumber = response.data.address.number
         $scope.clientAddressState = response.data.address.state
         $scope.clientAddressCity = response.data.address.city
-        $scope.clientAddressCreditCards = response.data.cards
-        $scope.clientCartOrders = response.data.cart.orders
-        $scope.clientCartDiscount = response.data.cart.discount
-        $scope.clientNumberOfItemsBought = response.data.boughtItems
         if (clientIsVerified) {
           $scope.clientVerified = 'Sí';
         } else {
@@ -122,6 +123,10 @@ angular.module('myApp.controllers_client', []).
       }, function errorCallback(response) {
         console.log('Couldn\'t delete account.');
       });
+    }
+
+    $scope.goToWallet = function(){
+      $state.go('wallet')
     }
 
     $scope.getClient();
@@ -183,12 +188,12 @@ angular.module('myApp.controllers_client', []).
       }
     }
   }).
-  controller('Controller_ClientShoppingCart', function ($scope, authenticationService, $http, networkService, $state) {
+  controller('Controller_ClientShoppingCart', function ($rootScope, $scope, authenticationService, $http, networkService, $state) {
 
-    const visaUrl = "http://icons.iconarchive.com/icons/designbolts/credit-card-payment/256/Visa-icon.png";
-    const masterCardUrl = "http://icons.iconarchive.com/icons/designbolts/credit-card-payment/256/Master-Card-icon.png"
-    const americanExpressUrl = "http://icons.iconarchive.com/icons/designbolts/credit-card-payment/256/American-Express-icon.png";
-    const cardThumbs = [visaUrl, masterCardUrl, americanExpressUrl];
+    var visaUrl = "http://icons.iconarchive.com/icons/designbolts/credit-card-payment/256/Visa-icon.png";
+    var masterCardUrl = "http://icons.iconarchive.com/icons/designbolts/credit-card-payment/256/Master-Card-icon.png"
+    var americanExpressUrl = "http://icons.iconarchive.com/icons/designbolts/credit-card-payment/256/American-Express-icon.png";
+    var cardThumbs = [visaUrl, masterCardUrl, americanExpressUrl];
 
     $scope.currentUser = function(){
       return authenticationService.currentUser();
@@ -222,20 +227,54 @@ angular.module('myApp.controllers_client', []).
     $scope.goToUpdate = function(){
       $state.go('client_profile');
     }
+
+    $scope.goToWallet = function(){
+      $state.go('wallet');
+    }
+
     //Redirects to login
     $scope.goToLogin = function(){
       $state.go('client_login');
+    }
+
+    $scope.getTotal = function(){
+      var total = 0
+      $scope.cart.orders.forEach((order, i) =>{
+        total += order.product.price * order.ammount
+      })
+      if($scope.client.cart.discount)
+        total -= total *($scope.client.cart.discount/100)
+
+      return total
     }
 
     //Performs a checkout of the client's products
     $scope.checkout = function(){
       $http.post(route + '/checkout', {})
         .success((ans) =>{
+          $state.reload();          
           console.log(ans)
+          if(!ans.error){
+            $rootScope.itemsInCart = 0;
+          }
         })
         .error((err) =>{
           console.log(err)
         })
+    }
+
+    $scope.removeItem = function(order){      
+      $http.put(route + '/cart', {
+        product: order.product._id,
+        ammount: order.ammount,
+        action: "remove"
+      }).success((ans) =>{
+        $rootScope.itemsInCart --;
+        console.log(ans);
+        $state.reload();
+      }).error((err) =>{
+        console.log(err);
+      })
     }
 
 
@@ -245,5 +284,69 @@ angular.module('myApp.controllers_client', []).
     $scope.loadMainMenu = function() {
       $state.go('main_menu');
     }
+  }).
+  controller('Controller_ClientWallet', function($scope, $http, $state, authenticationService){
+    $scope.visa = "http://icons.iconarchive.com/icons/designbolts/credit-card-payment/256/Visa-icon.png";
+    $scope.masterCard = "http://icons.iconarchive.com/icons/designbolts/credit-card-payment/256/Master-Card-icon.png"
+    $scope.americanExpress = "http://icons.iconarchive.com/icons/designbolts/credit-card-payment/256/American-Express-icon.png";
+    $scope.cardThumbs = [$scope.visa, $scope.masterCard, $scope.americanExpress];
+    $scope.cardNumber = null;
+    $scope.expirationDate = null;
+    $scope.cardType = null;
+
+    $scope.currentUser = function(){
+      return authenticationService.currentUser();
+    }
+    //get current user. May be client or admin
+    $scope.currentUser().then((data) =>{
+      $scope.client = data.user      
+      $scope.isAdmin = data.admin;      
+    })
+
+    $scope.goToLogin = function(){
+      $state.go('client_login')
+    }
+
+    $scope.mapCard = function(card){
+      switch (card.cardType) {
+        case "master card":
+          return $scope.masterCard
+        case "visa":
+          return $scope.visa;
+        case "american express":
+          return $scope.americanExpress;
+
+        default:
+          return $scope.visa          
+      }
+    }
+
+    $scope.removeCard = function(card){
+      $http.delete(route + '/wallet?number=' + card.number)
+      .success((res) =>{
+        console.log(res)
+        $state.reload();
+      }).error((err) =>{
+        console.log(err);
+      })
+    }
+
+    $scope.addCard = function(){    
+      console.log($scope.cardNumber)
+      console.log($scope.expirationDate)
+      console.log($scope.cardType);
+      $http.put(route + '/wallet', {
+        number:  $scope.cardNumber ,        
+        expirationDate: $scope.expirationDate,
+        type: $scope.cardType
+      }).success((ans) =>{
+        if(!ans.error)
+          $state.reload()
+      }).error((err)=>{
+        console.log(err);
+      })
+    }
+
+
   });
   

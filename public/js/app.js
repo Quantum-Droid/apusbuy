@@ -78,6 +78,11 @@ config(function ($stateProvider, $urlRouterProvider) {
       url: '/product_details/:product_id',
       templateUrl: 'partials/product_details.html',
       controller: 'Controller_ProductDetails'
+    }).
+    state('wallet', {
+      url: '/wallet',
+      templateUrl: 'partials/wallet.html',
+      controller: 'Controller_ClientWallet'
     })
 
     // For unmatched states

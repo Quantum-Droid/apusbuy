@@ -24,11 +24,11 @@ const SESSION_NOT_FOUND_ERROR = "No session found"
 const UNSUPPORTED_ACTION_ERROR = "Unsupported action."
 const ELEMENT_NOT_SAVED_ERROR = "Element could not be saved in the DB."
 const FIRST_DISCOUNT = 10; //10% discount
-const FIRST_DISCOUNT_REQUIREMENT = 5; //5 bought items needed for first discount
+const FIRST_DISCOUNT_REQUIREMENT = 4; //5 bought items needed for first discount
 const SECOND_DISCOUNT = 20;//20% discount
-const SECOND_DISCOUNT_REQUIREMENT = 10;//10 bought items needed for first discount
+const SECOND_DISCOUNT_REQUIREMENT = 9;//10 bought items needed for first discount
 const THIRD_DISCOUNT = 30; //30% discount
-var THIRD_DISCOUNT_REQUIREMENT = 20; //20 bought items needed for first discount
+var THIRD_DISCOUNT_REQUIREMENT = 19; //20 bought items needed for first discount
 
 const SU_ROLE = "Super User";
 const VENTAS_ROLE = "Ventas";
@@ -317,6 +317,43 @@ router.put('/client', (req, res) => {
 	});
 	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));	
 });
+
+router.put('/wallet', (req,res) =>{
+	var id = req.session.id;
+	var card = {
+		"number": req.body.number.toString(),
+		"expirationDate": req.body.expirationDate.toString(),
+		"cardType": req.body.type.toString()
+	}
+	if(id){
+		id = new ObjectId(id);
+		Client.findByIdAndUpdate(
+			id,
+			{$push: {"cards": card}},			
+			(err,model) =>{
+				if(!err && model)
+					return res.json(model)
+				else 
+					return res.json({error: err})
+			})
+	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR));
+})
+
+router.delete('/wallet', (req,res) =>{	
+	var id = req.session.id;
+	var card = req.query.number;
+	if(id){
+		id = new ObjectId(id);
+		Client.findByIdAndUpdate(
+			id,
+			{$pull: {"cards": {number: card}}},
+			(err,model) =>{
+				if(!err && model)
+					return res.json(model)
+				else return res.json(err)
+			})
+	}else return res.json(responseError(SESSION_NOT_FOUND_ERROR))
+})
 
 /*
 * Delete client by id
@@ -647,11 +684,22 @@ router.put('/cart', (req,res) =>{
 							}else return res.json(responseError(PRODUCT_NOT_FOUND_ERROR));
 						})
 					}else	if(action === "remove"){
-						client.cart.orders.forEach((order, index) =>{
-							if(order.product == productId.toString()){
-								client.cart.orders.splice(index, 1);							
-							}						
-						})
+						var orderId = null;						
+						for (var i = 0; i < client.cart.orders.length; i++) {
+							// console.log(client.cart.orders[i].product)
+							if(client.cart.orders[i].product == productId.toString()
+								 && client.cart.orders[i].ammount == ammount){
+								console.log('found')
+								client.cart.orders.splice(i, 1);
+								break;
+							}
+						}
+						// client.cart.orders.forEach((order, index) =>{
+						// 	if(order.product == productId.toString()){
+						// 		client.cart.orders.splice(index, 1);
+						// 		return
+						// 	}						
+						// })
 						client.save((err, savedClient) =>{
 								if(!err) return res.json(savedClient);
 								else return res.json(responseError(err));

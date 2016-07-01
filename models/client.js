@@ -19,9 +19,9 @@ var clientSchema = mongoose.Schema({
 		city: String,
 	},
 	cards: [{
-		number: String,
-		code: String,
-		expirationDate: String
+		number: String,		
+		expirationDate: String,
+		cardType: String
 	}],
 	cart: {
 		orders: [{product: {type: ObjectId, ref: 'Product'}, ammount: Number}],

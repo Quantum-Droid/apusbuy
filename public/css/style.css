@@ -86,3 +86,7 @@ body {
 textarea {
    resize: none;
 }
+
+.main-content{
+	margin-top: 2em
+}

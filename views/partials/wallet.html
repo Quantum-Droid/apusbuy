@@ -1,0 +1,90 @@
+<div class="container">
+	
+	<!-- CLIENT IN SESSION -->
+	<div ng-show="client && !isAdmin">
+
+		<!-- Client current cards -->
+		<div class="bottom" ng-show="client.cards.length">
+			<h2>Tus tarjetas</h2>
+			<div class="box-content">
+				<table class="table">
+					<th style="width:15%;"></th>
+					<th>Tarjeta</th>
+					<th>Fecha de expiración</th>
+					<th><!--remove card--></th> 
+					<tbody ng-repeat="card in client.cards">
+						<tr class="sucess" ng-repeat="card in client.cards">
+	            <td>
+	              <img ng-src="{{mapCard(card)}}" alt="thumbnail" width="20%" height="auto">
+	            </td>
+	            <td>{{card.number}}</td>
+	            <td>{{card.expirationDate}}</td>
+	            <td>
+	                <button type="button" class="btn btn-danger btn-md" ng-click="removeCard(card)">
+	                  <span class="glyphicon glyphicon-remove"></span> remove
+	              </button>
+              </td>
+					</tbody>	
+				</table>
+			</div>	
+		</div>
+
+
+		<div style="text-align: center;">
+			<h2 style="display:inline;">Aceptamos</h2>
+			<ul style="display:inline;">
+				<li ng-repeat="x in cardThumbs" style="display:inline;">
+					<img ng-src="{{x}}" width="10%" height="auto">			
+				</li>
+			</ul>
+		</div>	
+
+		<div class="row box-content">			  	  
+			<form class="form-horizontal" role="form">
+			  <div class="form-group">
+			    <label class="control-label col-sm-2" for="number">Numero de tarjeta:</label>
+			    <div class="col-sm-10">
+			      <input ng-model="cardNumber" class="form-control" placeholder="Ingresa numero de tarjeta">
+			    </div>
+			  </div>
+			  <div class="form-group">
+			    <label class="control-label col-sm-2" for="Fecha">Fecha de expiración:</label>
+			    <div class="col-sm-10"> 
+			      <input ng-model="expirationDate" type="date" class="form-control" id="pwd" placeholder="Ingresa la fecha de expiración">
+			    </div>
+			  </div>
+			  <div class="form-group"> 
+			    <div class="col-sm-offset-2 col-sm-10">
+			      <div class="radio-inline">
+			        <label><input ng-model="cardType" value="master card" type="radio"> Master Card</label>			        
+			      </div>
+			      <div class="radio-inline">
+			        <label><input ng-model="cardType" value="visa" type="radio"> Visa</label>			        
+			      </div>
+			      <div class="radio-inline">
+			        <label><input ng-model="cardType" value="american express" type="radio"> American Express</label>			        
+			      </div>
+			    </div>
+			  </div>
+			  <div class="form-group"> 
+			    <div class="col-sm-offset-2 col-sm-10">
+			      <button type="button" class="btn btn-success btn-lg" ng-click="addCard()">
+		          <span class="glyphicon glyphicon-credit-card"></span> Agregar
+		        </button>
+			    </div>
+			  </div>
+			</form>
+		</div>
+	</div>
+
+	<!-- Not in session or admin -->
+	<div ng-hide="client && !isAdmin">
+		<div class="col-xs-12">
+  		<p>Debes iniciar sesión para poder acceder</p>
+  		<a class="btn btn-info btn-lg box-content" ng-click="goToLogin()">
+	      <span class="glyphicon glyphicon-log-in"></span> Log in
+	    </a>
+  	</div>
+	</div>
+
+</div>
