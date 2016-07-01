@@ -29,6 +29,19 @@ angular.module('myApp.controllers_product', []).
       });
     }
 
+    // Load admin page according to role
+    $scope.loadAdminRole = function(role) {
+      if (role === 'Ventas') {
+        $state.go('admin_salesmen');
+      } else if (role === 'Recursos Humanos') {
+        $state.go('admin_hr');
+      } else if (role === 'Super User') {
+        $state.go('admin_superuser');
+      } else {
+        console.log('No role found');
+      }
+    }
+
     // Method to listen to login events
     $scope.$on('loginEvent', function(loginEvent) {
       $scope.getClientSession();
@@ -62,6 +75,11 @@ angular.module('myApp.controllers_product', []).
           $scope.$emit('logoutEvent');
         });
       }
+    }
+
+    // Method to load login
+    $scope.loadLogin = function() {
+      $state.go('client_login');
     }
 
     // Method to get all available products.

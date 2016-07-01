@@ -6,23 +6,22 @@
 		</h3>
 	</p>
 	<p>
-		Utilice este portal para iniciar sesión como administrador (vendedor, recursos humanos o superusuario).
+		Utilice este portal para iniciar sesión como administrador (vendedor, recursos humanos o superusuario). <a ui-sref="client_login">Soy cliente.</a>
 	</p>
 	<p>
 		<form name="user_login_form" novalidate>
 			<!-- Maybe change input to EMAIL? -->
-			Usuario (Admin): <input type="text" name="admin" ng-model="admin" ng-required="true"/>
+			Usuario (Admin): <input type="text" name="admin" ng-model="admin" ng-required="true" class="form-control"/>
 			<span class="error-message" ng-show="user_login_form.admin.$dirty && user_login_form.admin.$error.required">
 				Por favor introduzca su usuario de administrador.
 			 </span>
 			 <br/>
-			 <br/>
-			 Contraseña: <input type="password" name="password" ng-model="password" ng-required="true"/>
+			 Contraseña: <input type="password" name="password" ng-model="password" ng-required="true" class="form-control"/>
 			 <span class="error-message" ng-show="user_login_form.password.$dirty && user_login_form.password.$error.required">
 			 	Por favor introduzca su contraseña.
 			 </span>
 		</form>
 		<br/>
-		<button ng-click="adminLogin()">Iniciar sesión</button>
+		<button ng-click="adminLogin()" class="btn btn-success">Iniciar sesión</button>
 	</p>
 </div>

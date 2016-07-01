@@ -59,6 +59,7 @@ angular.module('myApp.controllers_client', []).
         $scope.clientLastName = response.data.lastName
         $scope.clientEmail = response.data.email
         $scope.clientBirthdate = response.data.birthdate
+        $scope.clientProfilePicture = response.data.avatar
         var clientIsVerified = response.data.verified
         $scope.prev_clientPassword = response.data.password
         $scope.clientAddressStreet = response.data.address.street
@@ -88,6 +89,7 @@ angular.module('myApp.controllers_client', []).
             "name":$scope.clientName, 
             "lastName":$scope.clientLastName,
             "birthdate":$scope.clientBirthdate,
+            "avatar":$scope.clientProfilePicture,
             "email":$scope.clientEmail,
             "password":$scope.clientNewPassword,
             "street":$scope.clientAddressStreet,

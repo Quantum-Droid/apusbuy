@@ -6,18 +6,19 @@
 		</h3>
 	</p>
 	<p>
-		¡Bienvenido a Apu's Buy! Por favor introduzca su usuario y contraseña.
+		¡Bienvenido a Apu's Buy! Por favor introduzca su usuario y contraseña. <a ui-sref="admin_login">Soy administrador.</a>
 	</p>
 	<form name="client_login_form" novalidate>
 		<!-- Maybe change input to EMAIL? -->
 		Usuario: <input type="text" name="client" ng-model="client" ng-required="true" class="form-control"/>
 		<span class="error-message" ng-show="client_login_form.client.$dirty && client_login_form.client.$error.required">
 			Por favor introduzca su usuario.
-		 </span>
-		 Contraseña: <input type="password" name="password" ng-model="password" ng-required="true" class="form-control"/>
-		 <span class="error-message" ng-show="client_login_form.password.$dirty && client_login_form.password.$error.required">
-		 	Por favor introduzca su contraseña.
-		 </span>
+		</span>
+		<br/>
+		Contraseña: <input type="password" name="password" ng-model="password" ng-required="true" class="form-control"/>
+		<span class="error-message" ng-show="client_login_form.password.$dirty && client_login_form.password.$error.required">
+			Por favor introduzca su contraseña.
+		</span>
 	</form>
 	<br/>
 	<button ng-click="login()" class="btn btn-success">Iniciar sesión</button>
